@@ -23,7 +23,7 @@ namespace Domain.Entities
         public int RoleId { get; set; }
         public Role role { get; set; }
         [ForeignKey("RankCustomerId")]
-
+        
         public int RankCustomerId { get; set; }
         public RankCustomer rankCustomer { get; set; }
 
@@ -31,8 +31,8 @@ namespace Domain.Entities
         public int UserStatusId { get; set; }
         public UserStatus userStatus { get; set; }
 
-        public IEnumerable<ConfirmEmail> confirmEmail { get; set; }
-        public IEnumerable<RefreshToken> refreshToken { get; set; }
+        public IEnumerable<ConfirmEmail>? confirmEmail { get; set; }
+        public IEnumerable<RefreshToken>? refreshToken { get; set; }
         public IEnumerable<Bill> bill { get; set; }
 
 

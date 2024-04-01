@@ -48,16 +48,18 @@ namespace Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Ticket>()
+              .HasOne(b => b.seat)
+              .WithMany(u => u.ticket)
+              .HasForeignKey(b => b.SeatId)
+              .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Bill>()
                 .HasOne(b => b.user)
                 .WithMany(u => u.bill)
                 .HasForeignKey(b => b.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<Ticket>()
-                .HasOne(b => b.seat)
-                .WithMany(u => u.ticket)
-                .HasForeignKey(b => b.SeatId)
-                .OnDelete(DeleteBehavior.Restrict);
+          
         }
     }
 }
