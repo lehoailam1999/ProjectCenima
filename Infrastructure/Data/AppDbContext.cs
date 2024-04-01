@@ -18,6 +18,7 @@ namespace Infrastructure.Data
         {
         }
         public DbSet<Bill> Bills { get; set; }
+        public DbSet<Banner> Banners { get; set; }
         public DbSet<BillStatus> BillStatuses { get; set; }
         public DbSet<BillTicket> BillTickets { get; set; }
         public DbSet<Cinema> Cenimas { get; set; }
