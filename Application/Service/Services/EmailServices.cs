@@ -28,7 +28,7 @@ namespace Application.Service.Services
 
         public string SendEmail(string mailTo, string subject, string body/*, List<IFormFile> attachments = null*/)
         {
-            string appPass = "qpyj hsts zyec dipr";
+            string appPass = "rwqu qdqe nbwm cxck";
             string mailAddress = "lamlhph18789@fpt.edu.vn";
 
             // Tạo đối tượng MimeMessage

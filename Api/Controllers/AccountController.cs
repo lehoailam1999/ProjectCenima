@@ -1,11 +1,14 @@
-﻿using Application.Payload.DataRequest;
+﻿using Application.Constants;
+using Application.Payload.DataRequest;
 using Application.Service.IServices;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route(Constant.DefaultValue.DEFAULT_CONTROLLER_ROUTE)]
     [ApiController]
     public class AccountController : ControllerBase
     {
@@ -41,6 +44,24 @@ namespace Api.Controllers
             {
                 return StatusCode(500, ex.Message); // Handle exceptions appropriately
             }
+        }
+        [HttpPut]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
+        public async Task<IActionResult> ChagePassWord(Request_ChangePassword request)
+        {
+            var user = HttpContext.User.FindFirst("Id");
+            if (user==null)
+            {
+                return BadRequest("User Id not found");
+            }
+            int id;
+            bool parseId = int.TryParse(user.Value, out id);
+            if (!parseId)
+            {
+                return BadRequest("Invalid User ID.");
+            }
+            return Ok(await _service.ChangePassWord(id, request));
         }
     }
 }

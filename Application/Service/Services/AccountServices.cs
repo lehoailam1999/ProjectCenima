@@ -1,9 +1,12 @@
-﻿using Application.Payload.Converter;
+﻿using Application.Constants;
+using Application.Payload.Converter;
 using Application.Payload.DataRequest;
 using Application.Payload.DataResponse;
 using Application.Payload.Response;
 using Application.Service.IServices;
 using Domain.Entities;
+using Domain.InterfaceRepositories;
+using Domain.Validation;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +20,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using BcryptNet = BCrypt.Net.BCrypt;
 
 namespace Application.Service.Services
 {
@@ -27,14 +31,19 @@ namespace Application.Service.Services
         private readonly Converter_User _converter;
         private readonly IEmailServices _emailServices;
         private readonly IConfiguration _configuration;
+        private readonly IUserRepositories _userRepositories;
 
-        public AccountServices(IEmailServices emailServices,AppDbContext context, Converter_User converter, IConfiguration configuration)
+        private readonly IBaseRepositories<User> _baseRepositories;
+
+        public AccountServices(IUserRepositories userRepositories,IBaseRepositories<User> baseRepositories,IEmailServices emailServices,AppDbContext context, Converter_User converter, IConfiguration configuration)
         {
             _context = context;
             _response = new ResponseObject<Response_Resgister>();
             _converter = converter;
             _configuration = configuration;
             _emailServices = emailServices;
+            _baseRepositories = baseRepositories;
+            _userRepositories = userRepositories;
         }
 
         public ResponseObject<Response_Token> Login(Request_Login request)
@@ -49,7 +58,9 @@ namespace Application.Service.Services
             {
                 return response.ResponseError(StatusCodes.Status400BadRequest, "Vui lòng điền đầy đủ thông tin!", null);
             }
-            if (user.Password != request.PassWord)
+            var checkPassword = BcryptNet.Verify(request.PassWord, user.Password);
+
+            if (!checkPassword)
             {
                 return response.ResponseError(StatusCodes.Status400BadRequest, "Mật khẩu không chính xác!", null);
             }
@@ -107,10 +118,60 @@ namespace Application.Service.Services
         {
             User user = new User();
             user.Name = request.Name;
+            var userWithUserName = _userRepositories.GetUserByUsername(request.UserName);
+            if (userWithUserName!=null)
+            {
+                return new ResponseObject<Response_Resgister>
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Message = "UserName already exists!!!!!",
+                    Data = null
+                };
+            }
             user.UserName = request.UserName;
             user.Point = request.Point;
-            user.Password = request.Password;
-            user.PhoneNumber = request.PhoneNumber; 
+            //Check password
+            if (!ValidateInput.IsValidPhoneNumber(request.Password))
+            {
+                return new ResponseObject<Response_Resgister>
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Message = "Password does not meet the required criteria.",
+                    Data = null
+                };
+            }
+
+            user.Password = BcryptNet.HashPassword(request.Password);
+            var userWithPhone = _userRepositories.GetUserByPhoneNumber(request.PhoneNumber);
+            if (userWithPhone != null)
+            {
+                return new ResponseObject<Response_Resgister>
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Message = "Phone Number already xists!!!!",
+                    Data = null
+                };
+            }
+            if (!ValidateInput.IsValidPhoneNumber(request.PhoneNumber))
+            {
+                return new ResponseObject<Response_Resgister>
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Message = "Phone Number contains 10 digits",
+                    Data = null
+                };
+            }
+            user.PhoneNumber = request.PhoneNumber;
+            var userWithEmail = _userRepositories.GetUserByEmail(request.Email);
+            if (userWithEmail != null)
+            {
+                return new ResponseObject<Response_Resgister>
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Message = "Email already exists!!!!!",
+                    Data = null
+                };
+            }
             user.Email = request.Email;
             user.IsActive = false;
             user.RoleId = 1;
@@ -166,5 +227,21 @@ namespace Application.Service.Services
             return _response.ResponseSuccess("Xác nhận email thành công",null);
         }
 
+        public async Task<string> ChangePassWord(int id, Request_ChangePassword request)
+        {
+            var user = await _context.Users.FindAsync(id);
+            bool checkPassword = BcryptNet.Verify(request.OldPassword, user.Password);
+            if (!checkPassword)
+            {
+                return "Incorrect password";
+            }
+            if (!request.NewPassword.Equals(request.ConfirmPassword))
+            {
+                return "Password do not macth";
+            }
+            user.Password = BcryptNet.HashPassword(request.NewPassword);
+            await _baseRepositories.UpdateAsync(user);
+            return "Change password success";
+        }
     }
 }

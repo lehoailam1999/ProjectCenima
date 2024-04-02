@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : DbContext,IAppDbContext
     {
         public AppDbContext()
         {
@@ -41,6 +41,8 @@ namespace Infrastructure.Data
         public DbSet<ConfirmEmail> ConfirmEmails { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Role> Roles { get; set; }
+
+       
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer("Data Source=DESKTOP-5K7OTPS\\SQLEXPRESS;Initial Catalog=Project_Cinema;Integrated Security=True;Encrypt=true;Trustservercertificate=true;");
@@ -61,5 +63,15 @@ namespace Infrastructure.Data
                 .OnDelete(DeleteBehavior.Restrict);
           
         }
+        public async Task<int> CommitChangesAsync()
+        {
+            return await base.SaveChangesAsync();
+        }
+
+        public DbSet<TEntity> SetEntity<TEntity>() where TEntity : class
+        {
+            return base.Set<TEntity>();
+        }
+
     }
 }

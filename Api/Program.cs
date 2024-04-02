@@ -3,7 +3,10 @@ using Application.Payload.DataResponse;
 using Application.Payload.Response;
 using Application.Service.IServices;
 using Application.Service.Services;
+using Domain.Entities;
+using Domain.InterfaceRepositories;
 using Infrastructure.Data;
+using Infrastructure.ImplementRepositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -21,6 +24,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IAccountServices, AccountServices>();
 builder.Services.AddTransient<IEmailServices, EmailServices>();
+builder.Services.AddTransient<IBaseRepositories<User>, BaseRepositories<User>>();
+builder.Services.AddScoped<IDbContext, AppDbContext>();
+
 builder.Services.AddScoped<ResponseObject<Response_Resgister>>();
 builder.Services.AddScoped<Converter_User>();
 builder.Services.AddSwaggerGen(c => {

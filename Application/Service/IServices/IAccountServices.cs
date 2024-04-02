@@ -15,5 +15,6 @@ namespace Application.Service.IServices
         Task<ResponseObject<Response_Resgister>> Register(Request_Register request);
         ResponseObject<Response_Token> Login(Request_Login request);
         Task<ResponseObject<ConfirmEmail>> ConfirmEmail(string code);
+        Task<string> ChangePassWord(int id, Request_ChangePassword request);
     }
 }
