@@ -12,7 +12,8 @@ namespace Application.Service.IServices
 {
     public interface IAccountServices
     {
-        ResponseObject<Response_Resgister> Register(Request_Register request);
+        Task<ResponseObject<Response_Resgister>> Register(Request_Register request);
         ResponseObject<Response_Token> Login(Request_Login request);
+        Task<ResponseObject<ConfirmEmail>> ConfirmEmail(string code);
     }
 }

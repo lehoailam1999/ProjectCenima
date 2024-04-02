@@ -20,6 +20,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IAccountServices, AccountServices>();
+builder.Services.AddTransient<IEmailServices, EmailServices>();
 builder.Services.AddScoped<ResponseObject<Response_Resgister>>();
 builder.Services.AddScoped<Converter_User>();
 builder.Services.AddSwaggerGen(c => {
@@ -49,7 +50,6 @@ builder.Services.AddSwaggerGen(c => {
         }
     });
 });
-///
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

@@ -6,6 +6,7 @@ using Application.Service.IServices;
 using Domain.Entities;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -24,14 +25,16 @@ namespace Application.Service.Services
         private readonly AppDbContext _context;
         private readonly ResponseObject<Response_Resgister> _response;
         private readonly Converter_User _converter;
+        private readonly IEmailServices _emailServices;
         private readonly IConfiguration _configuration;
 
-        public AccountServices(AppDbContext context, Converter_User converter, IConfiguration configuration)
+        public AccountServices(IEmailServices emailServices,AppDbContext context, Converter_User converter, IConfiguration configuration)
         {
             _context = context;
             _response = new ResponseObject<Response_Resgister>();
             _converter = converter;
             _configuration = configuration;
+            _emailServices = emailServices;
         }
 
         public ResponseObject<Response_Token> Login(Request_Login request)
@@ -100,7 +103,7 @@ namespace Application.Service.Services
             return dataResponseToken;
         }
 
-        public ResponseObject<Response_Resgister> Register(Request_Register request)
+        public  async Task<ResponseObject<Response_Resgister>> Register(Request_Register request)
         {
             User user = new User();
             user.Name = request.Name;
@@ -109,13 +112,59 @@ namespace Application.Service.Services
             user.Password = request.Password;
             user.PhoneNumber = request.PhoneNumber; 
             user.Email = request.Email;
-            user.IsActive = true;
+            user.IsActive = false;
             user.RoleId = 1;
             user.UserStatusId = 1;
             user.RankCustomerId = 1;
             _context.Users.Add(user);
-            _context.SaveChanges();
-            return _response.ResponseSuccess("Đăng ký tài khoản thành công", _converter.EntityToDTO(user));
+            await _context.SaveChangesAsync();
+            string confirmationToken = Guid.NewGuid().ToString();
+
+            // Save confirmation token to database
+            ConfirmEmail confirmEmail = new ConfirmEmail
+            {
+                UserId = user.Id,
+                CodeActive = confirmationToken,
+                ExpiredTime = DateTime.UtcNow.AddHours(24),
+                IsConfirm = false
+            };
+
+            _context.ConfirmEmails.Add(confirmEmail);
+            await _context.SaveChangesAsync();
+            string subject = "Test";
+            string body = "Hello World " + confirmationToken;
+            // Send confirmation email
+            string emailResult = _emailServices.SendEmail(user.Email, subject, body);
+            
+
+            return _response.ResponseSuccess($"Đăng ký tài khoản thành công. Vui lòng kiểm tra email để xác nhận đăng ký.{emailResult}", _converter.EntityToDTO(user));
         }
+        public async Task<ResponseObject<ConfirmEmail>> ConfirmEmail(string code)
+        {
+            ResponseObject<ConfirmEmail> _response = new ResponseObject<ConfirmEmail>();
+
+            var confirmEmail = await _context.ConfirmEmails.FirstOrDefaultAsync(x => x.CodeActive == code && x.ExpiredTime > DateTime.UtcNow);
+
+            if (confirmEmail == null)
+            {
+                return _response.ResponseError(StatusCodes.Status400BadRequest, "Mã xác nhận không hợp lệ hoặc đã hết hạn", null) ;
+            }
+
+            var user = await _context.Users.FindAsync(confirmEmail.UserId);
+            if (user == null)
+            {
+                return _response.ResponseError(StatusCodes.Status400BadRequest, "Người dùng không tồn tại", null);
+            }
+
+            user.IsActive = true;
+            await _context.SaveChangesAsync();
+
+            // Update ConfirmEmail
+            confirmEmail.IsConfirm = true;
+            await _context.SaveChangesAsync();
+
+            return _response.ResponseSuccess("Xác nhận email thành công",null);
+        }
+
     }
 }
