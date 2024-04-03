@@ -8,8 +8,6 @@ namespace Application.Service.IServices
 {
     public interface IEmailServices
     {
-        /*        Task SendConfirmationEmail(string email, string confirmationToken);
-        */
         string SendEmail(string mailTo, string subject, string body);
     }
 }

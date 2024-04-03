@@ -50,5 +50,45 @@ namespace Infrastructure.ImplementRepositories
             }
             return entity;
         }
+
+        public async Task<TEntity> AddAsync(TEntity entity)
+        {
+            DBSet.Add(entity);
+            await _IdbContext.CommitChangesAsync();
+            return entity;
+        }
+
+        public async Task<TEntity> FindAsync(params object[] keyValues)
+        {
+            var data = await DBSet.FindAsync(keyValues);
+            return data;
+        }
+        public async Task<bool> DeleteAsync(int id)
+        {
+            try
+            {
+                var dataEntity = await DBSet.FindAsync(id);
+                if (dataEntity != null)
+                {
+                    DBSet.Remove(dataEntity);
+                    await _IdbContext.CommitChangesAsync();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+
+            }
+            catch (Exception)
+            {
+
+                return false; ;
+            }
+           
+
+            
+        }
     }
 }

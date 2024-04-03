@@ -25,7 +25,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAccountServices, AccountServices>();
 builder.Services.AddTransient<IEmailServices, EmailServices>();
 builder.Services.AddTransient<IBaseRepositories<User>, BaseRepositories<User>>();
+builder.Services.AddTransient<IBaseRepositories<RefreshToken>, BaseRepositories<RefreshToken>>();
+builder.Services.AddTransient<IBaseRepositories<ConfirmEmail>, BaseRepositories<ConfirmEmail>>();
+builder.Services.AddTransient<IBaseRepositories<Role>, BaseRepositories<Role>>();
 builder.Services.AddScoped<IDbContext, AppDbContext>();
+builder.Services.AddScoped<IUserRepositories, UserRepositories>();
 
 builder.Services.AddScoped<ResponseObject<Response_Resgister>>();
 builder.Services.AddScoped<Converter_User>();

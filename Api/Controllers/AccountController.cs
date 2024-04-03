@@ -13,12 +13,10 @@ namespace Api.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountServices _service;
-        private readonly IEmailServices _serviceEmail;
 
-        public AccountController(IAccountServices service, IEmailServices serviceEmail)
+        public AccountController(IAccountServices service)
         {
             _service = service;
-            _serviceEmail = serviceEmail;
         }
 
         [HttpPost("register")]
@@ -28,9 +26,9 @@ namespace Api.Controllers
             return Ok(register);
         }
         [HttpPost("login")]
-        public IActionResult Login(Request_Login request)
+        public async Task<IActionResult> Login(Request_Login request)
         {
-            return Ok(_service.Login(request));
+            return Ok(await _service.Login(request));
         }
         [HttpPost("ConfirmEmail")]
         public async Task<IActionResult> ConfirmEmail(string code)
@@ -63,5 +61,17 @@ namespace Api.Controllers
             }
             return Ok(await _service.ChangePassWord(id, request));
         }
+        [HttpPost("ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            return Ok(await _service.ForgotPassword(email));
+        }
+        [HttpPut("CreateNewPassWord")]
+        public async Task<IActionResult> CreateNewPassWord(Request_NewPassWord request)
+        {
+            return Ok(await _service.ConfirmCreateNewPasWord(request));
+
+        }
+
     }
 }

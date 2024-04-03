@@ -6,7 +6,6 @@ using Application.Payload.Response;
 using Application.Service.IServices;
 using Domain.Entities;
 using Domain.InterfaceRepositories;
-using Domain.Validation;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +25,6 @@ namespace Application.Service.Services
 {
     public class AccountServices : IAccountServices
     {
-        private readonly AppDbContext _context;
         private readonly ResponseObject<Response_Resgister> _response;
         private readonly Converter_User _converter;
         private readonly IEmailServices _emailServices;
@@ -34,22 +32,33 @@ namespace Application.Service.Services
         private readonly IUserRepositories _userRepositories;
 
         private readonly IBaseRepositories<User> _baseRepositories;
-
-        public AccountServices(IUserRepositories userRepositories,IBaseRepositories<User> baseRepositories,IEmailServices emailServices,AppDbContext context, Converter_User converter, IConfiguration configuration)
+        private readonly IBaseRepositories<Role> _baseRolesRepositories;
+        private readonly IBaseRepositories<RefreshToken> _baseRefreshRepositories;
+        private readonly IBaseRepositories<ConfirmEmail> _baseConfirmRepositories;
+        public AccountServices(IBaseRepositories<Role> baseRolesRepositories,
+            IBaseRepositories<RefreshToken> baseRefreshRepositories,
+            IBaseRepositories<ConfirmEmail> baseConfirmRepositories,
+            IUserRepositories userRepositories,
+            IBaseRepositories<User> baseRepositories,
+            IEmailServices emailServices, 
+            Converter_User converter, 
+            IConfiguration configuration)
         {
-            _context = context;
             _response = new ResponseObject<Response_Resgister>();
             _converter = converter;
             _configuration = configuration;
             _emailServices = emailServices;
             _baseRepositories = baseRepositories;
             _userRepositories = userRepositories;
+            _baseConfirmRepositories = baseConfirmRepositories;
+            _baseRefreshRepositories = baseRefreshRepositories;
+            _baseRolesRepositories = baseRolesRepositories;
         }
 
-        public ResponseObject<Response_Token> Login(Request_Login request)
+        public async Task<ResponseObject<Response_Token>> Login(Request_Login request)
         {
             ResponseObject<Response_Token> response = new ResponseObject<Response_Token>();
-            var user = _context.Users.SingleOrDefault(x => x.UserName == request.UserName);
+           var user = await _userRepositories.GetUserByUsername(request.UserName);
             if (user == null)
             {
                 return response.ResponseError(StatusCodes.Status404NotFound, "Username không đúng ", null);
@@ -64,7 +73,7 @@ namespace Application.Service.Services
             {
                 return response.ResponseError(StatusCodes.Status400BadRequest, "Mật khẩu không chính xác!", null);
             }
-            return response.ResponseSuccess("Đăng nhập thành công!", GenerateAccessToken(user));
+            return response.ResponseSuccess("Đăng nhập thành công!",await GenerateAccessToken(user));
         }
 
         public string GennerateRefreshToKen()
@@ -76,11 +85,11 @@ namespace Application.Service.Services
                 return Convert.ToBase64String(random);
             }
         }
-        public Response_Token GenerateAccessToken(User user)
+        public async Task<Response_Token> GenerateAccessToken(User user)
         {
             var jwtTokenHandle = new JwtSecurityTokenHandler();
             var secretKeyByte = System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:SecretKey").Value);
-            var role = _context.Roles.SingleOrDefault(x => x.Id == user.RoleId);
+            var role = await _baseRolesRepositories.FindAsync(user.RoleId);
             var tokenDescription = new SecurityTokenDescriptor
             {
                 Subject = new System.Security.Claims.ClaimsIdentity(new[]
@@ -104,8 +113,7 @@ namespace Application.Service.Services
                 ExpiresTime = DateTime.Now.AddDays(1),
                 UserId = user.Id
             };
-            _context.RefreshTokens.Add(rf);
-            _context.SaveChanges();
+            await _baseRefreshRepositories.AddAsync(rf);
             Response_Token dataResponseToken = new Response_Token()
             {
                 AccessToken = accessToken,
@@ -118,7 +126,7 @@ namespace Application.Service.Services
         {
             User user = new User();
             user.Name = request.Name;
-            var userWithUserName = _userRepositories.GetUserByUsername(request.UserName);
+            var userWithUserName = await _userRepositories.GetUserByUsername(request.UserName);
             if (userWithUserName!=null)
             {
                 return new ResponseObject<Response_Resgister>
@@ -131,7 +139,7 @@ namespace Application.Service.Services
             user.UserName = request.UserName;
             user.Point = request.Point;
             //Check password
-            if (!ValidateInput.IsValidPhoneNumber(request.Password))
+           /* if (!ValidateInput.IsValidPassword(request.Password))
             {
                 return new ResponseObject<Response_Resgister>
                 {
@@ -139,10 +147,10 @@ namespace Application.Service.Services
                     Message = "Password does not meet the required criteria.",
                     Data = null
                 };
-            }
+            }*/
 
             user.Password = BcryptNet.HashPassword(request.Password);
-            var userWithPhone = _userRepositories.GetUserByPhoneNumber(request.PhoneNumber);
+            var userWithPhone =await _userRepositories.GetUserByPhoneNumber(request.PhoneNumber);
             if (userWithPhone != null)
             {
                 return new ResponseObject<Response_Resgister>
@@ -152,7 +160,7 @@ namespace Application.Service.Services
                     Data = null
                 };
             }
-            if (!ValidateInput.IsValidPhoneNumber(request.PhoneNumber))
+            /*if (!ValidateInput.IsValidPhoneNumber(request.PhoneNumber))
             {
                 return new ResponseObject<Response_Resgister>
                 {
@@ -160,9 +168,9 @@ namespace Application.Service.Services
                     Message = "Phone Number contains 10 digits",
                     Data = null
                 };
-            }
+            }*/
             user.PhoneNumber = request.PhoneNumber;
-            var userWithEmail = _userRepositories.GetUserByEmail(request.Email);
+            var userWithEmail = await _userRepositories.GetUserByEmail(request.Email);
             if (userWithEmail != null)
             {
                 return new ResponseObject<Response_Resgister>
@@ -177,9 +185,13 @@ namespace Application.Service.Services
             user.RoleId = 1;
             user.UserStatusId = 1;
             user.RankCustomerId = 1;
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            string confirmationToken = Guid.NewGuid().ToString();
+            await _baseRepositories.AddAsync(user);
+            /*_context.Users.Add(user);
+            await _context.SaveChangesAsync();*/
+            Random rand = new Random();
+            int randomNumber = rand.Next(1000, 10000);
+
+            string confirmationToken = randomNumber.ToString();
 
             // Save confirmation token to database
             ConfirmEmail confirmEmail = new ConfirmEmail
@@ -190,46 +202,51 @@ namespace Application.Service.Services
                 IsConfirm = false
             };
 
-            _context.ConfirmEmails.Add(confirmEmail);
-            await _context.SaveChangesAsync();
+            /*            _context.ConfirmEmails.Add(confirmEmail);
+            */
+            await _baseConfirmRepositories.AddAsync(confirmEmail);
             string subject = "Test";
-            string body = "Hello World " + confirmationToken;
+            string body = "Mã xác nhận là :" + confirmationToken;
             // Send confirmation email
             string emailResult = _emailServices.SendEmail(user.Email, subject, body);
-            
-
             return _response.ResponseSuccess($"Đăng ký tài khoản thành công. Vui lòng kiểm tra email để xác nhận đăng ký.{emailResult}", _converter.EntityToDTO(user));
         }
         public async Task<ResponseObject<ConfirmEmail>> ConfirmEmail(string code)
         {
             ResponseObject<ConfirmEmail> _response = new ResponseObject<ConfirmEmail>();
 
-            var confirmEmail = await _context.ConfirmEmails.FirstOrDefaultAsync(x => x.CodeActive == code && x.ExpiredTime > DateTime.UtcNow);
+            /*            var confirmEmail = await _context.ConfirmEmails.FirstOrDefaultAsync(x => x.CodeActive == code && x.ExpiredTime > DateTime.UtcNow);
+            */
+            var confirmEmail = await _userRepositories.GetConfirmEmailByCode(code);
 
-            if (confirmEmail == null)
+            if (confirmEmail == null )
             {
-                return _response.ResponseError(StatusCodes.Status400BadRequest, "Mã xác nhận không hợp lệ hoặc đã hết hạn", null) ;
+                return _response.ResponseError(StatusCodes.Status400BadRequest, "Mã xác nhận không hợp lệ ", null) ;
+            }
+            if (confirmEmail.ExpiredTime <= DateTime.UtcNow)
+            {
+                return _response.ResponseError(StatusCodes.Status400BadRequest, "Mã xác nhận đã hết hạn", null);
             }
 
-            var user = await _context.Users.FindAsync(confirmEmail.UserId);
+            var user = await _baseRepositories.FindAsync(confirmEmail.UserId);
             if (user == null)
             {
                 return _response.ResponseError(StatusCodes.Status400BadRequest, "Người dùng không tồn tại", null);
             }
 
             user.IsActive = true;
-            await _context.SaveChangesAsync();
+            await _baseRepositories.UpdateAsync(user);
 
             // Update ConfirmEmail
             confirmEmail.IsConfirm = true;
-            await _context.SaveChangesAsync();
+            await _baseConfirmRepositories.UpdateAsync(confirmEmail);
 
             return _response.ResponseSuccess("Xác nhận email thành công",null);
         }
 
         public async Task<string> ChangePassWord(int id, Request_ChangePassword request)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _baseRepositories.FindAsync(id);
             bool checkPassword = BcryptNet.Verify(request.OldPassword, user.Password);
             if (!checkPassword)
             {
@@ -242,6 +259,78 @@ namespace Application.Service.Services
             user.Password = BcryptNet.HashPassword(request.NewPassword);
             await _baseRepositories.UpdateAsync(user);
             return "Change password success";
+        }
+
+        public async Task<string> ForgotPassword(string email)
+        {
+           var userWithEmail = await _userRepositories.GetUserByEmail(email);
+            if (userWithEmail==null)
+            {
+                return "Email don't exists!!!!";
+            }
+            /*var confirmEmail = await _userRepositories.GetConfirmEmailById(userWithEmail.Id);
+            _context.ConfirmEmails.Remove(confirmEmail);
+            await _context.SaveChangesAsync();*/
+            var cofirmithUserId = await _userRepositories.GetConfirmEmailByUserId(userWithEmail.Id);
+            bool delete = await _baseConfirmRepositories.DeleteAsync(cofirmithUserId.Id);
+            if (delete ==true)
+            {
+                Random rand = new Random();
+                int randomNumber = rand.Next(1000, 10000);
+
+                string confirmationToken = randomNumber.ToString();
+
+                // Save confirmation token to database
+                ConfirmEmail confirm = new ConfirmEmail
+                {
+                    UserId = userWithEmail.Id,
+                    CodeActive = confirmationToken,
+                    ExpiredTime = DateTime.UtcNow.AddHours(24),
+                    IsConfirm = false
+                };
+
+                /*            _context.ConfirmEmails.Add(confirm);
+                */
+                await _baseConfirmRepositories.AddAsync(confirm);
+                string subject = "Forgot Password";
+                string body = "Mã xác nhận là :" + confirmationToken;
+                // Send confirmation email
+                string emailResult = _emailServices.SendEmail(email, subject, body);
+                return "Mã xác nhân đã gửi đến email! Mời bạn kiểm tra Email";
+            }
+            else
+            {
+                return "Bạn chưa gửi được mã xác nhận";
+            }
+        }
+
+        public async Task<string> ConfirmCreateNewPasWord(Request_NewPassWord request)
+        {
+            try
+            {
+                var confiremEmail = await _userRepositories.GetConfirmEmailByConFirmCode(request.ConfirmCode);
+                if (confiremEmail == null)
+                {
+                    return "Mã xác nhận không đúng";
+                }
+                if (!request.Password.Equals(request.ConfirmPassword))
+                {
+                    return "Password don't match";
+                }
+                var user = await _baseRepositories.FindAsync(confiremEmail.UserId);
+                user.Password = BcryptNet.HashPassword(request.Password);
+                await _baseRepositories.UpdateAsync(user);
+                confiremEmail.IsConfirm = true;
+                await _baseConfirmRepositories.UpdateAsync(confiremEmail); 
+                return "Create password successfully";
+            }
+            catch (Exception ex)
+            {
+
+                return "Error: " + ex.Message;
+            }
+
+
         }
     }
 }

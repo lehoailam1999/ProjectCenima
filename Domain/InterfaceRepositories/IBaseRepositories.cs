@@ -10,5 +10,9 @@ namespace Domain.InterfaceRepositories
     {
         Task<TEntity> UpdateAsync(TEntity entity);
         Task<TEntity> UpdateAsync(int id, TEntity entity);
+        Task<TEntity> AddAsync(TEntity entity);
+        Task<TEntity> FindAsync(params Object[] keyValues);
+        Task<bool> DeleteAsync(int id);
+
     }
 }
