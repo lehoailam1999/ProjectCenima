@@ -6,8 +6,6 @@ using Application.Payload.Response;
 using Application.Service.IServices;
 using Domain.Entities;
 using Domain.InterfaceRepositories;
-using Infrastructure.Data;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
