@@ -75,3 +75,8 @@ namespace Infrastructure.Data
 
     }
 }
+/*
+ * Phân tích chức năng:
+ * Đăng ký, Gửi email xác nhận,Đăng nhập,Quên mất khẩu,Đổi mật khẩu,
+ * CRUD mỗi bảng
+ */

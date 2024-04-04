@@ -18,5 +18,6 @@ namespace Application.Service.IServices
         Task<string> ChangePassWord(int id, Request_ChangePassword request);
         Task<string> ForgotPassword(string email);
         Task<string> ConfirmCreateNewPasWord(Request_NewPassWord request);
+        Task<string> ReNewCode(string email);
     }
 }

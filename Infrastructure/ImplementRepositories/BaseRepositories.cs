@@ -37,20 +37,7 @@ namespace Infrastructure.ImplementRepositories
             _dbContext.Entry(entity).State = EntityState.Modified;
             await _IdbContext.CommitChangesAsync();
             return entity;
-        }
-
-        public async Task<TEntity> UpdateAsync(int id, TEntity entity)
-        {
-            var data = await DBSet.FindAsync(id);
-            if (data != null)
-            {
-                _dbContext.Entry(entity).State = EntityState.Modified;
-                await _IdbContext.CommitChangesAsync();
-                return entity;
-            }
-            return entity;
-        }
-
+        }       
         public async Task<TEntity> AddAsync(TEntity entity)
         {
             DBSet.Add(entity);

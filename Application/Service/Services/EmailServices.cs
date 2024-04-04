@@ -13,8 +13,6 @@ using MimeKit;
 using MailKit.Security;
 using MailKit.Net.Smtp;
 
-
-
 namespace Application.Service.Services
 {
     public class EmailServices : IEmailServices

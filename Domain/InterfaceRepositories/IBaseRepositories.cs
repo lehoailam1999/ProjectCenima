@@ -9,7 +9,6 @@ namespace Domain.InterfaceRepositories
     public interface IBaseRepositories<TEntity> where TEntity : class
     {
         Task<TEntity> UpdateAsync(TEntity entity);
-        Task<TEntity> UpdateAsync(int id, TEntity entity);
         Task<TEntity> AddAsync(TEntity entity);
         Task<TEntity> FindAsync(params Object[] keyValues);
         Task<bool> DeleteAsync(int id);

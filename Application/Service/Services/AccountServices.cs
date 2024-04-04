@@ -6,6 +6,7 @@ using Application.Payload.Response;
 using Application.Service.IServices;
 using Domain.Entities;
 using Domain.InterfaceRepositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -64,6 +65,11 @@ namespace Application.Service.Services
             if (string.IsNullOrWhiteSpace(request.UserName) || string.IsNullOrWhiteSpace(request.PassWord))
             {
                 return response.ResponseError(StatusCodes.Status400BadRequest, "Vui lòng điền đầy đủ thông tin!", null);
+            }
+            if (user.IsActive == false)
+            {
+                return response.ResponseError(StatusCodes.Status404NotFound, "Tài khoản chưa được xác thực Email", null);
+
             }
             var checkPassword = BcryptNet.Verify(request.PassWord, user.Password);
 
@@ -191,7 +197,6 @@ namespace Application.Service.Services
 
             string confirmationToken = randomNumber.ToString();
 
-            // Save confirmation token to database
             ConfirmEmail confirmEmail = new ConfirmEmail
             {
                 UserId = user.Id,
@@ -205,16 +210,12 @@ namespace Application.Service.Services
             await _baseConfirmRepositories.AddAsync(confirmEmail);
             string subject = "Test";
             string body = "Mã xác nhận là :" + confirmationToken;
-            // Send confirmation email
             string emailResult = _emailServices.SendEmail(user.Email, subject, body);
             return _response.ResponseSuccess($"Đăng ký tài khoản thành công. Vui lòng kiểm tra email để xác nhận đăng ký.{emailResult}", _converter.EntityToDTO(user));
         }
         public async Task<ResponseObject<ConfirmEmail>> ConfirmEmail(string code)
         {
             ResponseObject<ConfirmEmail> _response = new ResponseObject<ConfirmEmail>();
-
-            /*            var confirmEmail = await _context.ConfirmEmails.FirstOrDefaultAsync(x => x.CodeActive == code && x.ExpiredTime > DateTime.UtcNow);
-            */
             var confirmEmail = await _userRepositories.GetConfirmEmailByCode(code);
 
             if (confirmEmail == null )
@@ -242,6 +243,39 @@ namespace Application.Service.Services
             return _response.ResponseSuccess("Xác nhận email thành công",null);
         }
 
+        public async Task<string> ReNewCode(string email)
+        {
+            var userWithEmail = await _userRepositories.GetUserByEmail(email);
+            if (userWithEmail == null)
+            {
+                return "Email don't exists!!!!";
+            }
+            var cofirmithUserId = await _userRepositories.GetConfirmEmailByUserId(userWithEmail.Id);
+            bool delete = await _baseConfirmRepositories.DeleteAsync(cofirmithUserId.Id);
+            if (delete == true)
+            {
+                Random rand = new Random();
+                int randomNumber = rand.Next(1000, 10000);
+
+                string confirmationToken = randomNumber.ToString();
+                ConfirmEmail confirm = new ConfirmEmail
+                {
+                    UserId = userWithEmail.Id,
+                    CodeActive = confirmationToken,
+                    ExpiredTime = DateTime.UtcNow.AddHours(24),
+                    IsConfirm = false
+                };
+                await _baseConfirmRepositories.AddAsync(confirm);
+                string subject = "Renew Password";
+                string body = "Mã xác nhận là :" + confirmationToken;
+                string emailResult = _emailServices.SendEmail(email, subject, body);
+                return $"{emailResult}! Mời bạn kiểm tra Email";
+            }
+            else
+            {
+                return "Bạn chưa gửi được mã xác nhận";
+            }
+        }
         public async Task<string> ChangePassWord(int id, Request_ChangePassword request)
         {
             var user = await _baseRepositories.FindAsync(id);
@@ -275,10 +309,7 @@ namespace Application.Service.Services
             {
                 Random rand = new Random();
                 int randomNumber = rand.Next(1000, 10000);
-
                 string confirmationToken = randomNumber.ToString();
-
-                // Save confirmation token to database
                 ConfirmEmail confirm = new ConfirmEmail
                 {
                     UserId = userWithEmail.Id,
@@ -292,9 +323,8 @@ namespace Application.Service.Services
                 await _baseConfirmRepositories.AddAsync(confirm);
                 string subject = "Forgot Password";
                 string body = "Mã xác nhận là :" + confirmationToken;
-                // Send confirmation email
                 string emailResult = _emailServices.SendEmail(email, subject, body);
-                return "Mã xác nhân đã gửi đến email! Mời bạn kiểm tra Email";
+                return $"{emailResult}! Mời bạn kiểm tra Email";
             }
             else
             {

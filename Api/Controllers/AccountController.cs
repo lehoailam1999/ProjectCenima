@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
-    [Route(Constant.DefaultValue.DEFAULT_CONTROLLER_ROUTE)]
+    [Route(Constant.AppSettings.DEFAULT_CONTROLLER_ROUTE)]
     [ApiController]
     public class AccountController : ControllerBase
     {
@@ -40,7 +40,7 @@ namespace Api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message); // Handle exceptions appropriately
+                return StatusCode(500, ex.Message);
             }
         }
         [HttpPut]
@@ -65,6 +65,11 @@ namespace Api.Controllers
         public async Task<IActionResult> ForgotPassword(string email)
         {
             return Ok(await _service.ForgotPassword(email));
+        }
+        [HttpPost("ReNewCodeToConfirm")]
+        public async Task<IActionResult> ReNewCodeToConfirm(string email)
+        {
+            return Ok(await _service.ReNewCode(email));
         }
         [HttpPut("CreateNewPassWord")]
         public async Task<IActionResult> CreateNewPassWord(Request_NewPassWord request)

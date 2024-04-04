@@ -30,7 +30,6 @@ builder.Services.AddTransient<IBaseRepositories<ConfirmEmail>, BaseRepositories<
 builder.Services.AddTransient<IBaseRepositories<Role>, BaseRepositories<Role>>();
 builder.Services.AddScoped<IDbContext, AppDbContext>();
 builder.Services.AddScoped<IUserRepositories, UserRepositories>();
-
 builder.Services.AddScoped<ResponseObject<Response_Resgister>>();
 builder.Services.AddScoped<Converter_User>();
 builder.Services.AddSwaggerGen(c => {
