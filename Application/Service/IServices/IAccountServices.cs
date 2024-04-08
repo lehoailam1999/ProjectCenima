@@ -19,5 +19,8 @@ namespace Application.Service.IServices
         Task<string> ForgotPassword(string email);
         Task<string> ConfirmCreateNewPasWord(Request_NewPassWord request);
         Task<string> ReNewCode(string email);
+        Task<IEnumerable<User>> GetAllUser();
+        Task<string> DeleteUser(int id);
+
     }
 }

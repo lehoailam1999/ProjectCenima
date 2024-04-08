@@ -4,16 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Entities
+namespace Application.Payload.DataResponse
 {
-    public class Food:BaseEntity
+    public class Response_Food
     {
         public double Price { get; set; }
         public string Description { get; set; }
         public string Image { get; set; }
         public double NameofFood { get; set; }
-        public bool IsActive { get; set; }
-        public IEnumerable<BillFood>? billFood { get; set; }
-
     }
 }

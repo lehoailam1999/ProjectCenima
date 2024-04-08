@@ -14,7 +14,6 @@ namespace Infrastructure.ImplementRepositories
         protected IDbContext _IdbContext = null;
         protected DbSet<TEntity> _dbSet;
         protected DbContext _dbContext;
-
         protected DbSet<TEntity> DBSet
         {
             get
@@ -32,6 +31,10 @@ namespace Infrastructure.ImplementRepositories
             _IdbContext = dbContext;
             _dbContext = (DbContext)dbContext;
         }
+
+
+        //CRUD
+
         public async Task<TEntity> UpdateAsync(TEntity entity)
         {
             _dbContext.Entry(entity).State = EntityState.Modified;
@@ -77,5 +80,12 @@ namespace Infrastructure.ImplementRepositories
 
             
         }
+        public async Task<List<TEntity>> GetAll()
+        {
+            var listData = await DBSet.ToListAsync();
+            return listData;
+        }
+
+       
     }
 }

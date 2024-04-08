@@ -13,19 +13,17 @@ namespace Api.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountServices _service;
-
         public AccountController(IAccountServices service)
         {
             _service = service;
         }
-
         [HttpPost("register")]
         public async Task<IActionResult> Register(Request_Register request_Register)
         {
             var register = await _service.Register(request_Register);
             return Ok(register);
         }
-        [HttpPost("login")]
+        [HttpPost("Login")]
         public async Task<IActionResult> Login(Request_Login request)
         {
             return Ok(await _service.Login(request));
@@ -43,22 +41,12 @@ namespace Api.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-        [HttpPut]
+        [HttpPut("ChangePassWord")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-
         public async Task<IActionResult> ChagePassWord(Request_ChangePassword request)
         {
-            var user = HttpContext.User.FindFirst("Id");
-            if (user==null)
-            {
-                return BadRequest("User Id not found");
-            }
-            int id;
-            bool parseId = int.TryParse(user.Value, out id);
-            if (!parseId)
-            {
-                return BadRequest("Invalid User ID.");
-            }
+            int id = int.Parse(HttpContext.User.FindFirst("Id").Value);
+
             return Ok(await _service.ChangePassWord(id, request));
         }
         [HttpPost("ForgotPassword")]
@@ -76,6 +64,18 @@ namespace Api.Controllers
         {
             return Ok(await _service.ConfirmCreateNewPasWord(request));
 
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var list = await _service.GetAllUser();
+            return Ok(list);
+        }
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            var delete = await _service.DeleteUser(id);
+            return Ok(delete);
         }
 
     }

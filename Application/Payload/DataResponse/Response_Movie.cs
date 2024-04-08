@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Entities
+namespace Application.Payload.DataResponse
 {
-    public class Movie:BaseEntity
+    public class Response_Movie
     {
         public int MovieDuration { get; set; }
         public DateTime EndTime { get; set; }
@@ -19,15 +18,7 @@ namespace Domain.Entities
         public string Language { get; set; }
         public string Name { get; set; }
         public string Trailer { get; set; }
-        [ForeignKey("RateId")]
         public int RateId { get; set; }
-        public Rate? rate { get; set; }
-        [ForeignKey("MovieTypeId")]
         public int MovieTypeId { get; set; }
-        public MovieTpye? movieTpye { get; set; }
-        public IEnumerable<Schedule>? schedule { get; set; }
-
-
-
     }
 }

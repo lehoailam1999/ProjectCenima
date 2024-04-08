@@ -16,5 +16,7 @@ namespace Domain.InterfaceRepositories
         Task<ConfirmEmail> GetConfirmEmailByCode(string code);
         Task<ConfirmEmail> GetConfirmEmailByUserId(int userId);
         Task<ConfirmEmail> GetConfirmEmailByConFirmCode(string code);
-    }
+/*        Task<IEnumerable<User>> GetAllUser();
+*//*        Task<bool> DeleteUser(int id);
+*/    }
 }

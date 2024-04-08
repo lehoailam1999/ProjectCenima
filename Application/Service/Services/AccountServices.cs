@@ -53,7 +53,6 @@ namespace Application.Service.Services
             _baseRefreshRepositories = baseRefreshRepositories;
             _baseRolesRepositories = baseRolesRepositories;
         }
-
         public async Task<ResponseObject<Response_Token>> Login(Request_Login request)
         {
             ResponseObject<Response_Token> response = new ResponseObject<Response_Token>();
@@ -66,7 +65,7 @@ namespace Application.Service.Services
             {
                 return response.ResponseError(StatusCodes.Status400BadRequest, "Vui lòng điền đầy đủ thông tin!", null);
             }
-            if (user.IsActive == false)
+            if (user.UserStatusId == 2)
             {
                 return response.ResponseError(StatusCodes.Status404NotFound, "Tài khoản chưa được xác thực Email", null);
 
@@ -126,7 +125,7 @@ namespace Application.Service.Services
             return dataResponseToken;
         }
 
-        public  async Task<ResponseObject<Response_Resgister>> Register(Request_Register request)
+        public async Task<ResponseObject<Response_Resgister>> Register(Request_Register request)
         {
             User user = new User();
             user.Name = request.Name;
@@ -185,9 +184,9 @@ namespace Application.Service.Services
                 };
             }
             user.Email = request.Email;
-            user.IsActive = false;
+            user.IsActive = true;
             user.RoleId = 1;
-            user.UserStatusId = 1;
+            user.UserStatusId = 2;//
             user.RankCustomerId = 1;
             await _baseRepositories.AddAsync(user);
             /*_context.Users.Add(user);
@@ -211,7 +210,7 @@ namespace Application.Service.Services
             string subject = "Test";
             string body = "Mã xác nhận là :" + confirmationToken;
             string emailResult = _emailServices.SendEmail(user.Email, subject, body);
-            return _response.ResponseSuccess($"Đăng ký tài khoản thành công. Vui lòng kiểm tra email để xác nhận đăng ký.{emailResult}", _converter.EntityToDTO(user));
+            return _response.ResponseSuccess($"Đăng ký tài khoản thành công. Vui lòng kiểm tra email để xác nhận đăng ký.{emailResult}",await _converter.EntityToDTO(user));
         }
         public async Task<ResponseObject<ConfirmEmail>> ConfirmEmail(string code)
         {
@@ -233,7 +232,7 @@ namespace Application.Service.Services
                 return _response.ResponseError(StatusCodes.Status400BadRequest, "Người dùng không tồn tại", null);
             }
 
-            user.IsActive = true;
+            user.UserStatusId = 1;
             await _baseRepositories.UpdateAsync(user);
 
             // Update ConfirmEmail
@@ -300,9 +299,6 @@ namespace Application.Service.Services
             {
                 return "Email don't exists!!!!";
             }
-            /*var confirmEmail = await _userRepositories.GetConfirmEmailById(userWithEmail.Id);
-            _context.ConfirmEmails.Remove(confirmEmail);
-            await _context.SaveChangesAsync();*/
             var cofirmithUserId = await _userRepositories.GetConfirmEmailByUserId(userWithEmail.Id);
             bool delete = await _baseConfirmRepositories.DeleteAsync(cofirmithUserId.Id);
             if (delete ==true)
@@ -359,6 +355,26 @@ namespace Application.Service.Services
             }
 
 
+        }
+
+        public async Task<IEnumerable<User>> GetAllUser()
+        {
+            var list =await _baseRepositories.GetAll();
+            return list;
+        }
+
+        public async Task<string> DeleteUser(int id)
+        {
+/*            var user = await _baseRepositories.FindAsync(id);
+*/            bool delete = await _baseRepositories.DeleteAsync(id);
+            if (delete)
+            {
+                return "Xóa user thành công";
+            }
+            else
+            {
+                return "Xóa User thất bại";
+            }
         }
     }
 }

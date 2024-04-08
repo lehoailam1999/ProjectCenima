@@ -18,13 +18,13 @@ namespace Domain.Entities
         [ForeignKey("SeatStatusId")]
 
         public int SeatStatusId { get; set; }
-        public SeatStatus seatStatus { get; set; }
+        public SeatStatus? seatStatus { get; set; }
 
         [ForeignKey("SeatTypeId")]
 
         public int SeatTypeId { get; set; }
-        public SeatType seatType { get; set; }
-        public IEnumerable<Ticket> ticket { get; set; }
+        public SeatType? seatType { get; set; }
+        public IEnumerable<Ticket>? ticket { get; set; }
 
 
     }

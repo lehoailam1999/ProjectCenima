@@ -4,15 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Entities
+namespace Application.Payload.DataRequest
 {
-    public class Cinema:BaseEntity
+    public class Request_Cinema
     {
         public string Address { get; set; }
         public string Description { get; set; }
         public string Code { get; set; }
         public string NameOfCinema { get; set; }
-        public bool IsActive { get; set; }
-        public IEnumerable<Room>? room { get; set; }
     }
 }
