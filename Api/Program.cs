@@ -14,14 +14,16 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.Text;
+using Application.Payload.Converter.Converter_BillBook;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var configuration = builder.Configuration;
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-/*builder.Services.AddControllers();
-*/// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -51,12 +53,18 @@ builder.Services.AddScoped<Converter_Seat>();
 builder.Services.AddScoped<IRoomServices, RoomServices>();
 builder.Services.AddTransient<IBaseRepositories<Room>, BaseRepositories<Room>>();
 builder.Services.AddScoped<ResponseObject<Response_Room>>();
+builder.Services.AddScoped<Response_Pagination<Response_Room>>();
 builder.Services.AddScoped<Converter_Room>();
 //Food
 builder.Services.AddScoped<IFoodServices, FoodServices>();
 builder.Services.AddTransient<IBaseRepositories<Food>, BaseRepositories<Food>>();
 builder.Services.AddScoped<ResponseObject<Response_Food>>();
 builder.Services.AddScoped<Converter_Food>();
+//Schedule
+builder.Services.AddScoped<ISchedulesServices, SchedulesServices>();
+builder.Services.AddTransient<IBaseRepositories<Schedule>, BaseRepositories<Schedule>>();
+builder.Services.AddScoped<ResponseObject<Response_Schedules>>();
+builder.Services.AddScoped<Converter_Schedules>();
 //Movie
 builder.Services.AddScoped<IMovieServices, MovieServices>();
 builder.Services.AddTransient<IBaseRepositories<Movie>, BaseRepositories<Movie>>();
@@ -69,15 +77,23 @@ builder.Services.AddTransient<IBaseRepositories<UserStatus>, BaseRepositories<Us
 //GetMovie
 builder.Services.AddScoped<IGetMovieRepositories, GetMovieRepositories>();
 builder.Services.AddScoped<IGetMovieServices, GetMovieServices>();
-services.AddControllers(options =>
-{
-    options.OutputFormatters.RemoveType<SystemTextJsonOutputFormatter>();
-    options.OutputFormatters.Add(new SystemTextJsonOutputFormatter(new JsonSerializerOptions(JsonSerializerDefaults.Web)
-    {
-        ReferenceHandler = ReferenceHandler.Preserve,
-    }));
-});
 
+//Bill
+builder.Services.AddScoped<IBillServices, BillServices>();
+builder.Services.AddScoped<IBaseRepositories<Bill>, BaseRepositories<Bill>>();
+builder.Services.AddScoped<Converter_Bill>();
+builder.Services.AddScoped<ResponseObject<Response_Bill>>();
+builder.Services.AddScoped<ResponseObject<Response_BillTickets>>();
+
+//BillTicket
+builder.Services.AddScoped<IBaseRepositories<BillTicket>, BaseRepositories<BillTicket>>();
+builder.Services.AddScoped<Convert_BillTickets>();
+builder.Services.AddScoped<IProjectRepositories,ProjectRepositories>();
+
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 builder.Services.AddSwaggerGen(c => {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
@@ -88,7 +104,7 @@ builder.Services.AddSwaggerGen(c => {
     {
         Name = "Authorization",
         Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
+        Scheme = "bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
         Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 1safsfsdfdfd\"",
@@ -105,11 +121,12 @@ builder.Services.AddSwaggerGen(c => {
         }
     });
 });
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.SaveToken = true;
-        options.RequireHttpsMetadata = false;
+        options.SaveToken = false;
+        options.RequireHttpsMetadata = true;
         options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
@@ -119,6 +136,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
 
     });
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
@@ -140,9 +158,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
+app.UseAuthentication();
 
 app.UseAuthorization();
-app.UseAuthentication();
 app.MapControllers();
 
 app.Run();

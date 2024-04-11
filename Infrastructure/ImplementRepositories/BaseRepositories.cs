@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -40,7 +41,20 @@ namespace Infrastructure.ImplementRepositories
             _dbContext.Entry(entity).State = EntityState.Modified;
             await _IdbContext.CommitChangesAsync();
             return entity;
-        }       
+        }
+        public async Task<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities)
+        {
+            try
+            {
+                DBSet.AddRangeAsync(entities);
+                await _IdbContext.CommitChangesAsync();
+                return entities;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
         public async Task<TEntity> AddAsync(TEntity entity)
         {
             DBSet.Add(entity);
@@ -86,6 +100,29 @@ namespace Infrastructure.ImplementRepositories
             return listData;
         }
 
-       
+        public async Task<TEntity> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            var data = await DBSet.SingleOrDefaultAsync(predicate);
+            return data; 
+        }
+        public async Task<List<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _dbContext.Set<TEntity>().Where(predicate).ToListAsync();
+        }
+
+        public List<TEntity> Where(Expression<Func<TEntity, bool>> predicate)
+        {
+            return  _dbContext.Set<TEntity>().Where(predicate).ToList();
+        }
+        public IQueryable<TEntity> WhereIQueryable(Expression<Func<TEntity, bool>> predicate)
+        {
+            return _dbContext.Set<TEntity>().Where(predicate).AsQueryable();
+        }
+
+        public TEntity SingleOrDefault(Expression<Func<TEntity, bool>> predicate)
+        {
+            var data =  DBSet.SingleOrDefault(predicate);
+            return data;
+        }
     }
 }

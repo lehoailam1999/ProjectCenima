@@ -16,18 +16,18 @@ namespace Domain.Entities
         public DateTime UpdateTime { get; set; }
         [ForeignKey("BillStatusId")]
         public int BillStatusId { get; set; }
-        public BillStatus billStatus { get; set; }
+        public BillStatus? billStatus { get; set; }
         [ForeignKey("PromotionId")]
         public int PromotionId { get; set; }
-        public Promotion promotion { get; set; }
+        public Promotion? promotion { get; set; }
 
         [ForeignKey("UserId")]
         public int UserId { get; set; }
-        public User user { get; set; }
+        public User? user { get; set; }
 
         public bool IsActive { get; set; }
-        public IEnumerable<BillTicket> billTicket { get; set; }
-        public IEnumerable<BillFood> billFood { get; set; }
+        public IEnumerable<BillTicket>? billTicket { get; set; }
+        public IEnumerable<BillFood>? billFood { get; set; }
 
 
     }

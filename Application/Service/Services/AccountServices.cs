@@ -93,6 +93,10 @@ namespace Application.Service.Services
             var jwtTokenHandle = new JwtSecurityTokenHandler();
             var secretKeyByte = System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:SecretKey").Value);
             var role = await _baseRolesRepositories.FindAsync(user.RoleId);
+            if (role == null)
+            {
+                throw new Exception("Role not found for the user.");
+            }
             var tokenDescription = new SecurityTokenDescriptor
             {
                 Subject = new System.Security.Claims.ClaimsIdentity(new[]

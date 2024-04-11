@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Data
 {
-    public class AppDbContext : DbContext,IAppDbContext
+    public class AppDbContext : DbContext, IAppDbContext
     {
         public AppDbContext()
         {
@@ -42,7 +42,7 @@ namespace Infrastructure.Data
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Role> Roles { get; set; }
 
-       
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer("Data Source=DESKTOP-5K7OTPS\\SQLEXPRESS;Initial Catalog=Project_Cinema;Integrated Security=True;Encrypt=true;Trustservercertificate=true;");
@@ -61,7 +61,21 @@ namespace Infrastructure.Data
                 .WithMany(u => u.bill)
                 .HasForeignKey(b => b.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
-          
+            modelBuilder.Entity<Schedule>()
+              .HasOne(s => s.room)
+               .WithMany(r => r.schedule)
+             .HasForeignKey(s => s.RoomId).OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Schedule>()
+              .HasOne(s => s.movie)
+               .WithMany(r => r.schedule)
+             .HasForeignKey(s => s.MovieId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Room>()
+                .HasOne(r => r.cinema)
+                .WithMany(c => c.room)
+                .HasForeignKey(r => r.CinemaId).OnDelete(DeleteBehavior.Restrict);
+
+
         }
         public async Task<int> CommitChangesAsync()
         {

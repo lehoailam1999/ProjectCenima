@@ -19,16 +19,22 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllSeat()
+        public async Task<IActionResult> GetAllSeat(int pageSize=1,int pageNumber=5)
         {
-            var listSeat = await _seatServices.GetAll();
+            var listSeat = await _seatServices.GetAll(pageSize,pageNumber);
+            return Ok(listSeat);
+        }
+        [HttpGet("GetAllSeatRoom")]
+        public async Task<IActionResult> GetAllSeatRoom(int idRoom)
+        {
+            var listSeat = await _seatServices.GetAllInRoom(idRoom);
             return Ok(listSeat);
         }
         [HttpPost]
         public async Task<IActionResult> AddNewSeat(Request_Seat request)
         {
-            var Seat = await _seatServices.AddNewSeat(request);
-            return Ok(Seat);
+            var seat = await _seatServices.AddNewSeat(request);
+            return Ok(seat);
         }
         [HttpPut]
         public async Task<IActionResult> UpdateSeat(int id)

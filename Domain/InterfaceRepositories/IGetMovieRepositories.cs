@@ -9,6 +9,8 @@ namespace Domain.InterfaceRepositories
 {
     public interface IGetMovieRepositories
     {
-        Task<IEnumerable<Movie>> GetMovieByIdCinema(int idCinema);
+        Task<List<Movie>> GetMovieByIdCinema(int idCinema);
+        Task<List<Movie>> GetMovieByIdRoom(int idRoom);
+        Task<List<Movie>> GetMovieGighLight();
     }
 }

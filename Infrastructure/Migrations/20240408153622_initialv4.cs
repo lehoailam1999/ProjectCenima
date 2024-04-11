@@ -69,7 +69,7 @@ namespace Infrastructure.Migrations
                 column: "movieTpyeId",
                 principalTable: "MovieTypes",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
         }
     }
 }

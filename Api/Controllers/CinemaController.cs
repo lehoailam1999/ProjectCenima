@@ -18,14 +18,12 @@ namespace Api.Controllers
         }
         [HttpGet]
         [Authorize(Roles = "Admin")]
-
-        public async Task<IActionResult> GetAllCinema()
+        public async Task<IActionResult> GetAllCinema(int pageSize=1,int pageNumber=5)
         {
-            var listCinema =await _cenimaServices.GetAll();
+            var listCinema =await _cenimaServices.GetAll(pageSize,pageNumber);
             return Ok(listCinema);
         }
         [HttpPost]
-        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> AddNewCinema(Request_Cinema request)
         {
@@ -33,15 +31,12 @@ namespace Api.Controllers
             return Ok(cinema);
         }
         [HttpPut]
-        [Authorize(Roles = "Admin")]
-
         public async Task<IActionResult> UpdateCinema(int id)
         {
             var cinema =await _cenimaServices.UpdateCinema(id);
             return Ok(cinema);
         }
         [HttpDelete]
-        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> DeleteCinema(int id)
         {

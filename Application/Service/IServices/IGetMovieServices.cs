@@ -1,4 +1,7 @@
-﻿using Domain.Entities;
+﻿using Application.Payload.DataRequest.InputRequest;
+using Application.Payload.DataResponse;
+using Application.Payload.Response;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +12,9 @@ namespace Application.Service.IServices
 {
     public interface IGetMovieServices
     {
-        Task<IEnumerable<Movie>> GetMovieByIdCinema(int idCinema);
-
+        Task<ResponseObject<List<Response_Movie>>> GetMovieByIdCinema(int idCinema);
+        Task<ResponseObject<List<Response_Movie>>> GetMovieByIdRoom(int idRoom);
+        Task<ResponseObject<List<Response_Movie>>> GetMovieByHighLight(Input input);
+        
     }
 }

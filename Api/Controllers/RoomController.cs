@@ -19,9 +19,9 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllRoom()
+        public async Task<IActionResult> GetAllRoom(int pageSize=1,int pageNumber=1)
         {
-            var listRoom = await _roomServices.GetAll();
+            var listRoom = await _roomServices.GetAll(pageSize,pageNumber);
             return Ok(listRoom);
         }
         [HttpPost]

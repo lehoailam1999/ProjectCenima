@@ -19,12 +19,14 @@ namespace Application.Service.Services
         private readonly IBaseRepositories<Room> _baseRoomRepositories;
         private readonly Converter_Room _converter;
         private readonly ResponseObject<Response_Room> _respon;
+        private readonly Response_Pagination<Response_Room> _respon_pagination;
 
-        public RoomServices(IBaseRepositories<Room> baseRoomRepositories, Converter_Room converter, ResponseObject<Response_Room> respon)
+        public RoomServices(IBaseRepositories<Room> baseRoomRepositories, Converter_Room converter, ResponseObject<Response_Room> respon, Response_Pagination<Response_Room> respon_pagination)
         {
             _baseRoomRepositories = baseRoomRepositories;
             _converter = converter;
             _respon = respon;
+            _respon_pagination = respon_pagination;
         }
 
         public async Task<ResponseObject<Response_Room>> AddNewRoom(Request_Room request)
@@ -52,11 +54,10 @@ namespace Application.Service.Services
             return "Delete Seat Successfully";
         }
 
-        public async Task<ResponseObject<List<Response_Room>>> GetAll()
+        public async Task<Response_Pagination<Response_Room>> GetAll(int pageSize,int pageNumber)
         {
-            ResponseObject<List<Response_Room>> listRes = new ResponseObject<List<Response_Room>>();
             var list = await _baseRoomRepositories.GetAll();
-            return listRes.ResponseSuccess("Danh sach Room", _converter.EntityToListDTO(list));
+            return _respon_pagination.ResponseSuccess("Danh sach Room",pageSize,pageNumber, _converter.EntityToListDTO(list));
         }
 
         public async Task<ResponseObject<Response_Room>> UpdateRoom(int id)

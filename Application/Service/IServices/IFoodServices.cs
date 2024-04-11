@@ -11,7 +11,7 @@ namespace Application.Service.IServices
 {
     public interface IFoodServices
     {
-        Task<ResponseObject<List<Response_Food>>> GetAll();
+        Task<Response_Pagination<Response_Food>> GetAll(int pageSize,int pageNumber);
         Task<ResponseObject<Response_Food>> AddNewFood(Request_Food request);
         Task<string> DeleteFood(int id);
         Task<ResponseObject<Response_Food>> UpdateFood(int id);

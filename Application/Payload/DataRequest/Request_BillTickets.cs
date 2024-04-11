@@ -8,11 +8,8 @@ using System.Threading.Tasks;
 
 namespace Application.Payload.DataRequest
 {
-    public class Request_Seat
+    public class Request_BillTickets
     {
-        public int Number { get; set; }
-        public string Line { get; set; }
-        public int RoomId { get; set; }
-        public int SeatTypeId { get; set; }
+        public int TicketId { get; set; }
     }
 }

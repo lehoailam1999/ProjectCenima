@@ -50,11 +50,11 @@ namespace Application.Service.Services
             return "Delete Food Successfully";
         }
 
-        public async Task<ResponseObject<List<Response_Food>>> GetAll()
+        public async Task<Response_Pagination<Response_Food>> GetAll(int pageSize,int pageNumber)
         {
-            ResponseObject<List<Response_Food>> listRes = new ResponseObject<List<Response_Food>>();
+            Response_Pagination<Response_Food> listRes = new Response_Pagination<Response_Food>();
             var list = await _baseFoodRepositories.GetAll();
-            return listRes.ResponseSuccess("Danh sach Food", _converter.EntityToListDTO(list));
+            return listRes.ResponseSuccess("Danh sach Food",pageSize,pageNumber, _converter.EntityToListDTO(list));
         }
 
         public async Task<ResponseObject<Response_Food>> UpdateFood(int id)

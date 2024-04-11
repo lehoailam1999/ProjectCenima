@@ -18,6 +18,24 @@ namespace Infrastructure.ImplementRepositories
         {
             _context = context;
         }
+
+        public async Task<List<BillTicket>> GetAllBillTicket(int idBill)
+        {
+            var lstBillTicket = await _context.BillTickets
+                .Include(bt => bt.ticket) // Ensure the ticket is loaded
+                .Where(bt => bt.BillId == idBill)
+                .ToListAsync();
+            return lstBillTicket;
+        }
+        public async Task<List<BillFood>> GetAllBillFood(int idBill)
+        {
+            var lstBillFood = await _context.BillFoods
+                .Include(bt => bt.food) // Ensure the ticket is loaded
+                .Where(bt => bt.BillId == idBill)
+                .ToListAsync();
+            return lstBillFood;
+        }
+
         public async Task<Cinema> GetCinema(int id)
         {
             var cinema = await _context.Cenimas.SingleOrDefaultAsync(x => x.Id.Equals(id));

@@ -23,7 +23,6 @@ namespace Domain.Entities
         public int RoleId { get; set; }
         public Role role { get; set; }
         [ForeignKey("RankCustomerId")]
-        
         public int RankCustomerId { get; set; }
         public RankCustomer rankCustomer { get; set; }
 

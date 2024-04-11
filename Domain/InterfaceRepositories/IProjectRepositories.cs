@@ -13,6 +13,9 @@ namespace Domain.InterfaceRepositories
         Task<Room> GetRoom(int id);
         Task<SeatStatus> GetSeatStatus(int id);
         Task<SeatType> GetSeatType(int id);
-        
+        Task<List<BillTicket>> GetAllBillTicket(int idBill);
+        Task<List<BillFood>> GetAllBillFood(int idBill);
+
+
     }
 }

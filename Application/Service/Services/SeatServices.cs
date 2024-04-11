@@ -35,7 +35,7 @@ namespace Application.Service.Services
             seat.IsActive = true;
             seat.RoomId = request.RoomId;
             seat.SeatTypeId = request.SeatTypeId;
-            seat.SeatStatusId = request.SeatStatusId;
+            seat.SeatStatusId = 2;
             await _baseSeatRepositories.AddAsync(seat);
             return _respon.ResponseSuccess("Add Seat Successfully", _converter.EntityToDTO(seat));
 
@@ -52,12 +52,26 @@ namespace Application.Service.Services
             return "Delete Seat Successfully";
         }
 
-        public async Task<ResponseObject<List<Response_Seat>>> GetAll()
+        public async Task<Response_Pagination<Response_Seat>> GetAll(int pageSize,int pageNumber)
+        {
+            Response_Pagination<Response_Seat> listRes = new Response_Pagination<Response_Seat>();
+            var list = await _baseSeatRepositories.GetAll();
+            return listRes.ResponseSuccess("Danh sach Cinema",pageSize,pageNumber,  _converter.EntityToListDTO(list));
+        }
+
+        public async Task<ResponseObject<List<Response_Seat>>> GetAllInRoom(int idRoom)
         {
             ResponseObject<List<Response_Seat>> listRes = new ResponseObject<List<Response_Seat>>();
-            var list = await _baseSeatRepositories.GetAll();
-            return listRes.ResponseSuccess("Danh sach Cinema",  _converter.EntityToListDTO(list));
+            var listSeatInRoom = await _baseSeatRepositories.WhereAsync(x=>x.RoomId==idRoom);
+            if (listSeatInRoom.Count==0)
+            {
+                return listRes.ResponseError(StatusCodes.Status404NotFound,"Phòng chưa có ghể", null);
+
+            }
+            return listRes.ResponseSuccess("Danh sach ghế trong  phòng", _converter.EntityToListDTO(listSeatInRoom));
+
         }
+
         public async Task<ResponseObject<Response_Seat>> UpdateSeat(int id)
         {
             var seatUpdate = await _baseSeatRepositories.FindAsync(id);

@@ -66,6 +66,7 @@ namespace Api.Controllers
 
         }
         [HttpGet]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> GetAll()
         {
             var list = await _service.GetAllUser();

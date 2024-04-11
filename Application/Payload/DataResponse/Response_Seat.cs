@@ -12,8 +12,8 @@ namespace Application.Payload.DataResponse
         public string Line { get; set; }
         public bool IsActive { get; set; }
         public int RoomId { get; set; }
-        public int SeatStatusId { get; set; }
-        public int SeatTypeId { get; set; }
+        public string SeatStatusName { get; set; }
+        public string SeatTypeName { get; set; }
     }
 }
 
