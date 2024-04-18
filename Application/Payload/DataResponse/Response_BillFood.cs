@@ -9,6 +9,6 @@ namespace Application.Payload.DataResponse
     public class Response_BillFood
     {
         public int Quantity { get; set; }
-        public int FoodId { get; set; }
+        public string NameFood { get; set; }
     }
 }

@@ -31,7 +31,7 @@ namespace Application.Service.Services
         {
             Cinema cinema = new Cinema();
             cinema.Address = request.Address;
-            cinema.Code = request.Code;
+            cinema.Code = Guid.NewGuid().ToString();
             cinema.Description = request.Description;
             cinema.NameOfCinema = request.NameOfCinema;
             cinema.IsActive = true;
@@ -42,10 +42,10 @@ namespace Application.Service.Services
 
         public async Task<string> DeleteCinema(int id)
         {
-            var cinemaDelete = _baseCinemaRepositories.FindAsync(id);
+            var cinemaDelete = await _baseCinemaRepositories.GetByIdAsync(id);
             if (cinemaDelete == null)
             {
-                return "NotFound";
+                return "Not Found";
             }
            await _baseCinemaRepositories.DeleteAsync(id);
             return "Delete Cinema Successfully";

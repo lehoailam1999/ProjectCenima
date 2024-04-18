@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Application.Payload.DataRequest;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -16,5 +17,7 @@ namespace Application.Payload.DataResponse
         public string RoomName { get; set; }
         public string MovieName { get; set; }
         public bool IsActive { get; set; }
+        public List<Response_Ticket>? request_Tickets { get; set; }
+
     }
 }

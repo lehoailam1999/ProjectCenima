@@ -10,5 +10,9 @@ namespace Application.Payload.DataResponse
     {
         public int Quantity { get; set; }
         public int TicketId { get; set; }
+        public string CinemaName { get; set; }
+        public string RoomName { get; set; }
+        public string MovieName { get; set; }
+
     }
 }

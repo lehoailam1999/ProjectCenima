@@ -124,5 +124,10 @@ namespace Infrastructure.ImplementRepositories
             var data =  DBSet.SingleOrDefault(predicate);
             return data;
         }
+
+        public async Task<TEntity> GetByIdAsync(int id)
+        {
+            return await DBSet.FindAsync(id);
+        }
     }
 }

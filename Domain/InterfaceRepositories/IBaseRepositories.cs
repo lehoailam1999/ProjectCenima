@@ -13,6 +13,7 @@ namespace Domain.InterfaceRepositories
         Task<TEntity> UpdateAsync(TEntity entity);
         Task<TEntity> AddAsync(TEntity entity);
         Task<TEntity> FindAsync(params Object[] keyValues);
+        Task<TEntity> GetByIdAsync(int id);
         Task<bool> DeleteAsync(int id);
         Task<List<TEntity>> GetAll();
         Task<TEntity> SingleOrDefaultAsync(Expression<Func<TEntity,bool>> predicate);

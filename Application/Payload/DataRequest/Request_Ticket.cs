@@ -8,13 +8,9 @@ using System.Threading.Tasks;
 
 namespace Application.Payload.DataRequest
 {
-    public class Request_Room
+    public class Request_Ticket
     {
-        public int Capacity { get; set; }
-        public int Type { get; set; }
-        public string Description { get; set; }
-        public string Name { get; set; }
-        public int CinemaId { get; set; }
-      
+        public double PriceTicket { get; set; }
+        public int SeatId { get; set; }
     }
 }

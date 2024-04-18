@@ -36,7 +36,7 @@ namespace Infrastructure.Migrations
                 column: "MovieId",
                 principalTable: "Movies",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
         }
     }
 }

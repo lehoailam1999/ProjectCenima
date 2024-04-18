@@ -11,6 +11,6 @@ namespace Application.Payload.DataRequest
         public double Price { get; set; }
         public string Description { get; set; }
         public string Image { get; set; }
-        public double NameofFood { get; set; }
+        public string NameofFood { get; set; }
     }
 }

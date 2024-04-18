@@ -70,10 +70,15 @@ namespace Infrastructure.Data
               .HasOne(s => s.movie)
                .WithMany(r => r.schedule)
              .HasForeignKey(s => s.MovieId).OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<Room>()
+            /*modelBuilder.Entity<Room>()
                 .HasOne(r => r.cinema)
                 .WithMany(c => c.room)
-                .HasForeignKey(r => r.CinemaId).OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(r => r.CinemaId).OnDelete(DeleteBehavior.NoAction);*/
+            modelBuilder.Entity<Cinema>()
+                .HasMany(c => c.room)
+                .WithOne(r => r.cinema)
+                .HasForeignKey(r => r.CinemaId)
+                .OnDelete(DeleteBehavior.Cascade);
 
 
         }

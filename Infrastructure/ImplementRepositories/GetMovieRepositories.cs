@@ -32,7 +32,10 @@ namespace Infrastructure.ImplementRepositories
 
         public async Task<List<Movie>> GetMovieByIdRoom(int idRoom)
         {
-            var listMOvie = await _context.Movies.Include(m => m.schedule).Where(m => m.schedule.Any(x => x.RoomId == idRoom)).ToListAsync();
+            var listMOvie = await _context.Movies
+                .Include(m => m.schedule)
+                .Where(m => m.schedule.Any(x => x.RoomId == idRoom))
+                .ToListAsync();
             return listMOvie;
         }
 
@@ -52,7 +55,7 @@ namespace Infrastructure.ImplementRepositories
                 .Select(bt => bt.ticket.ScheduleId)
                 .Distinct()
                 .ToList();
-            if (scheduleIds == null && scheduleIds.Count == 0)
+            if (scheduleIds == null && scheduleIds.Count == 0)  
             {
                 return null;
             }

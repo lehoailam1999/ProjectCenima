@@ -14,6 +14,7 @@ namespace Application.Payload.Converter
         {
             Response_Food response = new Response_Food()
             {
+                Id=food.Id,
                 Price = food.Price,
                 Description = food.Description,
                 Image = food.Image,
@@ -25,6 +26,7 @@ namespace Application.Payload.Converter
         {
             return listFood.Select(item => new Response_Food
             {
+                Id = item.Id,
                 Price = item.Price,
                 Description = item.Description,
                 Image = item.Image,

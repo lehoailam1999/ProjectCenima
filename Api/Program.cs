@@ -90,6 +90,18 @@ builder.Services.AddScoped<IBaseRepositories<BillTicket>, BaseRepositories<BillT
 builder.Services.AddScoped<Convert_BillTickets>();
 builder.Services.AddScoped<IProjectRepositories,ProjectRepositories>();
 
+//BillFood
+
+builder.Services.AddScoped<IBaseRepositories<BillFood>, BaseRepositories<BillFood>>();
+builder.Services.AddScoped<Convert_BillFood>();
+
+//ticket
+builder.Services.AddScoped<IBaseRepositories<Ticket>, BaseRepositories<Ticket>>();
+builder.Services.AddScoped<IBaseRepositories<Promotion>, BaseRepositories<Promotion>>();
+builder.Services.AddScoped<Converter_Ticket>();
+//seat
+builder.Services.AddScoped<IBaseRepositories<Seat>, BaseRepositories<Seat>>();
+
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
@@ -142,7 +154,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigin",
         builder =>
         {
-            builder.WithOrigins("http://localhost:3000") // Thay ??i ??a ch? này thành ??a ch? c?a ?ng d?ng React c?a b?n
+            builder.WithOrigins("http://localhost:5173") // Thay ??i ??a ch? này thành ??a ch? c?a ?ng d?ng React c?a b?n
                    .AllowAnyMethod()
                    .AllowAnyHeader();
         });

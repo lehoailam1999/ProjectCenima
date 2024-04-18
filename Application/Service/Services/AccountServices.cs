@@ -212,7 +212,7 @@ namespace Application.Service.Services
             */
             await _baseConfirmRepositories.AddAsync(confirmEmail);
             string subject = "Test";
-            string body = "Mã xác nhận là :" + confirmationToken;
+            string body = "Xin chào :" + confirmationToken;
             string emailResult = _emailServices.SendEmail(user.Email, subject, body);
             return _response.ResponseSuccess($"Đăng ký tài khoản thành công. Vui lòng kiểm tra email để xác nhận đăng ký.{emailResult}",await _converter.EntityToDTO(user));
         }
@@ -317,9 +317,6 @@ namespace Application.Service.Services
                     ExpiredTime = DateTime.UtcNow.AddHours(24),
                     IsConfirm = false
                 };
-
-                /*            _context.ConfirmEmails.Add(confirm);
-                */
                 await _baseConfirmRepositories.AddAsync(confirm);
                 string subject = "Forgot Password";
                 string body = "Mã xác nhận là :" + confirmationToken;

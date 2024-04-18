@@ -265,7 +265,7 @@ namespace Infrastructure.Migrations
                         column: x => x.CinemaId,
                         principalTable: "Cenimas",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_Rooms_Rooms_RoomId",
                         column: x => x.RoomId,

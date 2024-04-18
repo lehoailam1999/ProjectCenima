@@ -1,4 +1,5 @@
-﻿using Application.Payload.DataResponse;
+﻿using Application.Payload.Converter.Converter_BillBook;
+using Application.Payload.DataResponse;
 using Domain.Entities;
 using Domain.InterfaceRepositories;
 using System;
@@ -13,11 +14,15 @@ namespace Application.Payload.Converter
     {
         private readonly IBaseRepositories<Room> _baseRoomRepositories;
         private readonly IBaseRepositories<Movie> _baseMovieRepositories;
+        private readonly IBaseRepositories<Ticket> _baseTicketRepositories;
+        private readonly Converter_Ticket _converter;
 
-        public Converter_Schedules(IBaseRepositories<Room> baseRoomRepositories, IBaseRepositories<Movie> baseMovieRepositories)
+        public Converter_Schedules(IBaseRepositories<Room> baseRoomRepositories, IBaseRepositories<Movie> baseMovieRepositories, IBaseRepositories<Ticket> baseTicketRepositories, Converter_Ticket converter)
         {
             _baseRoomRepositories = baseRoomRepositories;
             _baseMovieRepositories = baseMovieRepositories;
+            _baseTicketRepositories = baseTicketRepositories;
+            _converter = converter;
         }
 
         public Response_Schedules EntityToDTO(Schedule schedule)
@@ -29,7 +34,16 @@ namespace Application.Payload.Converter
                 Code = schedule.Code,
                 RoomName = _baseRoomRepositories.SingleOrDefault(x=>x.Id==schedule.RoomId).Name,
                 MovieName = _baseMovieRepositories.SingleOrDefault(x=>x.Id==schedule.MovieId).Name
+
             };
+            if (schedule.Id != null)
+            {
+                var ticket = _baseTicketRepositories.Where(x => x.ScheduleId == schedule.Id);
+                if (ticket != null)
+                {
+                    response.request_Tickets = ticket.Select(bt => _converter.EntityToDTO(bt)).ToList();
+                }
+            }
             return response;
         }
         public List<Response_Schedules> EntityToListDTO(List<Schedule> listSchedules)

@@ -18,15 +18,17 @@ namespace Application.Service.Services
     {
         private readonly IBaseRepositories<Bill> _baseRepositories;
         private readonly IBaseRepositories<BillTicket> _baseBillTicketRepositories;
+        private readonly IBaseRepositories<Promotion> _basPromotiontRepositories;
         private readonly IBaseRepositories<BillFood> _baseBillFoodRepositories;
         private readonly IProjectRepositories _projectRepositories;
         private readonly ResponseObject<Response_Bill> _response;
         private readonly Converter_Bill _converter;
 
-        public BillServices(IBaseRepositories<Bill> baseRepositories, IBaseRepositories<BillTicket> baseBillTicketRepositories, IBaseRepositories<BillFood> baseBillFoodRepositories, IProjectRepositories projectRepositories, ResponseObject<Response_Bill> response, Converter_Bill converter)
+        public BillServices(IBaseRepositories<Bill> baseRepositories, IBaseRepositories<BillTicket> baseBillTicketRepositories, IBaseRepositories<Promotion> basPromotiontRepositories, IBaseRepositories<BillFood> baseBillFoodRepositories, IProjectRepositories projectRepositories, ResponseObject<Response_Bill> response, Converter_Bill converter)
         {
             _baseRepositories = baseRepositories;
             _baseBillTicketRepositories = baseBillTicketRepositories;
+            _basPromotiontRepositories = basPromotiontRepositories;
             _baseBillFoodRepositories = baseBillFoodRepositories;
             _projectRepositories = projectRepositories;
             _response = response;
@@ -50,6 +52,7 @@ namespace Application.Service.Services
             await _baseRepositories.AddAsync(bill);
             if (request.request_BillTickets!=null&&request.request_BillTickets.Any())
             {
+                // AddBillTicket
                 var lstBillTicket = await EntityToListBillTicket(bill.Id, request.request_BillTickets);
                 if (lstBillTicket==null)
                 {
@@ -59,7 +62,7 @@ namespace Application.Service.Services
                 bill.billTicket = lstBillTicket;
                 var lstBillTickets = await _projectRepositories.GetAllBillTicket(bill.Id);
                 double totalTicket = lstBillTickets.Sum(x => x.Quantity * x.ticket.PriceTicket);
-                //bill food
+                //AddBillFood
                 var lstBillFood = await EntityToListBillFood(bill.Id, request.request_BillFoods);
                 if (lstBillFood == null)
                 {
@@ -69,12 +72,21 @@ namespace Application.Service.Services
                 bill.billFood = lstBillFood;
                 var lstBillFoods = await _projectRepositories.GetAllBillFood(bill.Id);
                 double totalFood = lstBillFoods.Sum(x => x.Quantity * x.food.Price);
+                //promotion
+                var promotion = await _basPromotiontRepositories.FindAsync(bill.PromotionId);
+                if (promotion == null) 
+                {
+                   bill.ToTalDouble = totalTicket + totalFood;
 
-                bill.ToTalDouble = totalTicket+ totalFood;
+                }
+                else
+                {
+                    bill.ToTalDouble = (totalTicket + totalFood)*(promotion.Percent)/100;
+                }
+
 
                 await _baseRepositories.UpdateAsync(bill);
             }
-            //billfood
            
             return _response.ResponseSuccess( "Them bill thành công.", _converter.EntityToDTO(bill));
 
@@ -91,12 +103,14 @@ namespace Application.Service.Services
                 billTicket.BillId = idBill;
                 billTicket.Quantity = request.Count;
                 billTicket.TicketId = item.TicketId;
+               
                 lst.Add(billTicket);
             }
             await _baseBillTicketRepositories.AddRangeAsync(lst);
             return lst;
 
         }
+
         public async Task<List<BillFood>> EntityToListBillFood(int idBill, List<Request_BillFood> request)
         {
             List<BillFood> lst = new List<BillFood>();

@@ -37,7 +37,7 @@ namespace Application.Service.Services
             room.IsActive = true;
             room.Description = request.Description;
             room.Type = request.Type;
-            room.Code = request.Code;
+            room.Code = Guid.NewGuid().ToString();
             room.CinemaId = request.CinemaId;
             await _baseRoomRepositories.AddAsync(room);
             return _respon.ResponseSuccess("Add room Successfully", _converter.EntityToDTO(room));
