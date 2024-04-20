@@ -6,6 +6,7 @@ using Application.Service.IServices;
 using Domain.Entities;
 using Domain.InterfaceRepositories;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,22 +18,32 @@ namespace Application.Service.Services
     public class BillServices : IBillServices
     {
         private readonly IBaseRepositories<Bill> _baseRepositories;
+        private readonly IBaseRepositories<User> _baseUserRepositories;
+        private readonly IEmailServices _emailServices;
+        private readonly IConfiguration _configuration;
         private readonly IBaseRepositories<BillTicket> _baseBillTicketRepositories;
         private readonly IBaseRepositories<Promotion> _basPromotiontRepositories;
         private readonly IBaseRepositories<BillFood> _baseBillFoodRepositories;
         private readonly IProjectRepositories _projectRepositories;
         private readonly ResponseObject<Response_Bill> _response;
         private readonly Converter_Bill _converter;
+        private readonly IBaseRepositories<ConfirmEmail> _baseConfirmRepositories;
+        private readonly IUserRepositories _userRepositories;
 
-        public BillServices(IBaseRepositories<Bill> baseRepositories, IBaseRepositories<BillTicket> baseBillTicketRepositories, IBaseRepositories<Promotion> basPromotiontRepositories, IBaseRepositories<BillFood> baseBillFoodRepositories, IProjectRepositories projectRepositories, ResponseObject<Response_Bill> response, Converter_Bill converter)
+        public BillServices(IBaseRepositories<Bill> baseRepositories, IBaseRepositories<User> baseUserRepositories, IEmailServices emailServices, IConfiguration configuration, IBaseRepositories<BillTicket> baseBillTicketRepositories, IBaseRepositories<Promotion> basPromotiontRepositories, IBaseRepositories<BillFood> baseBillFoodRepositories, IProjectRepositories projectRepositories, ResponseObject<Response_Bill> response, Converter_Bill converter, IBaseRepositories<ConfirmEmail> baseConfirmRepositories, IUserRepositories userRepositories)
         {
             _baseRepositories = baseRepositories;
+            _baseUserRepositories = baseUserRepositories;
+            _emailServices = emailServices;
+            _configuration = configuration;
             _baseBillTicketRepositories = baseBillTicketRepositories;
             _basPromotiontRepositories = basPromotiontRepositories;
             _baseBillFoodRepositories = baseBillFoodRepositories;
             _projectRepositories = projectRepositories;
             _response = response;
             _converter = converter;
+            _baseConfirmRepositories = baseConfirmRepositories;
+            _userRepositories = userRepositories;
         }
 
         public async Task<ResponseObject<Response_Bill>> AddNewBill(Request_Bill request)
@@ -46,7 +57,7 @@ namespace Application.Service.Services
             bill.BillStatusId = 2;
             bill.PromotionId = 1;
             bill.UserId = request.UserId;
-            bill.IsActive = false;
+            bill.IsActive = true;
             bill.billTicket = null;
             bill.billFood = null;
             await _baseRepositories.AddAsync(bill);
@@ -88,7 +99,7 @@ namespace Application.Service.Services
                 await _baseRepositories.UpdateAsync(bill);
             }
            
-            return _response.ResponseSuccess( "Them bill thành công.", _converter.EntityToDTO(bill));
+            return _response.ResponseSuccess( "Thêm bil thành công.", _converter.EntityToDTO(bill));
 
 
         }
@@ -127,19 +138,76 @@ namespace Application.Service.Services
         }
 
 
-        public Task<string> DeleteBill(int id)
+        public async Task<string> DeleteBill(int id)
         {
-            throw new NotImplementedException();
+            var deleteBill =await _baseRepositories.FindAsync(id);
+            if (deleteBill==null)
+            {
+                return "Not Found";
+            };
+            deleteBill.IsActive = false;
+            await _baseRepositories.UpdateAsync(deleteBill);
+            return "Xóa bill thành công";
         }
 
-        public Task<Response_Pagination<Response_Bill>> GetAll(int pageSize, int pageNumber)
+        public async Task<Response_Pagination<Response_Bill>> GetAll(int pageSize, int pageNumber)
         {
-            throw new NotImplementedException();
+            Response_Pagination<Response_Bill> response_Pagination = new Response_Pagination<Response_Bill>();
+            var listBill= await _baseRepositories.GetAll();
+            if (listBill==null && listBill.Count==0)
+            {
+                return response_Pagination.ResponseError(StatusCodes.Status404NotFound, "Phân trang không thành công");
+            }
+            return response_Pagination.ResponseSuccess("Danh sách :", pageSize, pageNumber, _converter.EntityToListDTO(listBill));
         }
 
         public Task<ResponseObject<Request_Bill>> UpdateFood(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<ResponseObject<Response_Bill>> ThanhToan(int billId)
+        {
+            var bill = await _baseRepositories.FindAsync(billId);
+            var user = await _baseUserRepositories.SingleOrDefaultAsync(x => x.Id == bill.UserId);
+
+            var cofirmithUserId = await _userRepositories.GetConfirmEmailByUserId(user.Id);
+            bool delete = await _baseConfirmRepositories.DeleteAsync(cofirmithUserId.Id);
+            if (delete == true)
+            {
+                Random rand = new Random();
+                int randomNumber = rand.Next(1000, 10000);
+
+                string confirmationToken = randomNumber.ToString();
+                ConfirmEmail confirm = new ConfirmEmail
+                {
+                    UserId = user.Id,
+                    CodeActive = confirmationToken,
+                    ExpiredTime = DateTime.UtcNow.AddHours(24),
+                    IsConfirm = false
+                };
+                await _baseConfirmRepositories.AddAsync(confirm);
+                string subject = "Thanh toán thành công";
+                string body = "Thanh toán thành công";
+
+                string emailResult = _emailServices.SendEmail(user.Email, subject, body);
+                bill.BillStatusId = 1;
+                await _baseRepositories.UpdateAsync(bill);
+
+                return _response.ResponseSuccess($"Thanh toán thành công!{emailResult}", _converter.EntityToDTO(bill));
+           }
+            else
+            {
+                return _response.ResponseSuccess("Thanh toán không thành công thành công!CHưa gửi được email", null);
+            }
+
+        }
+
+        public  async Task<Response_Bill> FindBill(int id)
+        {
+            var bill = await _baseRepositories.FindAsync(id);
+            Response_Bill response_Bill = _converter.EntityToDTO(bill);
+            return response_Bill;
         }
     }
 }

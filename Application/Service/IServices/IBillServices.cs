@@ -16,5 +16,7 @@ namespace Application.Service.IServices
         Task<ResponseObject<Response_Bill>> AddNewBill(Request_Bill request);
         Task<string> DeleteBill(int id);
         Task<ResponseObject<Request_Bill>> UpdateFood(int id);
+        Task<ResponseObject<Response_Bill>> ThanhToan(int billId);
+        Task<Response_Bill> FindBill(int id);
     }
 }

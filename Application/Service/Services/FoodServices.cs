@@ -46,7 +46,8 @@ namespace Application.Service.Services
             {
                 return "NotFound";
             }
-            await _baseFoodRepositories.DeleteAsync(foodDelete.Id);
+            foodDelete.IsActive = false;
+            await _baseFoodRepositories.UpdateAsync(foodDelete);
             return "Delete Food Successfully";
         }
 

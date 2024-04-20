@@ -366,16 +366,14 @@ namespace Application.Service.Services
 
         public async Task<string> DeleteUser(int id)
         {
-/*            var user = await _baseRepositories.FindAsync(id);
-*/            bool delete = await _baseRepositories.DeleteAsync(id);
-            if (delete)
+          var delete = await _baseRepositories.FindAsync(id);
+            if (delete==null)
             {
-                return "Xóa user thành công";
+                return "Không tìm thấy tài khoản";
             }
-            else
-            {
-                return "Xóa User thất bại";
-            }
+            delete.IsActive = false;
+            await _baseRepositories.UpdateAsync(delete);
+            return "Xóa user thành công";
         }
     }
 }

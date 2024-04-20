@@ -50,5 +50,37 @@ namespace Application.Payload.Converter.Converter_BillBook
             }
             return response;
         }
+        public List<Response_Bill> EntityToListDTO(List<Bill> bill)
+        {
+            List<Response_Bill> list = new List<Response_Bill>();
+            foreach (var item in bill)
+            {
+                Response_Bill response = new Response_Bill()
+                {
+                    Name = item.Name,
+                    ToTalDouble = item.ToTalDouble,
+                    BillStatusId = item.BillStatusId,
+                    PromotionId = item.PromotionId,
+                    UserId = item.UserId
+                };
+                if (item.Id != null)
+                {
+                    var billTicket = _context.BillTickets.Where(x => x.BillId == item.Id);
+                    if (billTicket != null)
+                    {
+                        response.response_BillTickets = billTicket.Select(bt => _converter.EntityToDTO(bt)).ToList();
+                    }
+                    var billFood = _context.BillFoods.Where(x => x.BillId == item.Id);
+                    if (billFood != null)
+                    {
+                        response.response_BillFoods = billFood.Select(bf => _converterFood.EntityToDTO(bf)).ToList();
+                    }
+                }
+                list.Add(response);
+            }
+            return list;
+        }
+
+
     }
 }

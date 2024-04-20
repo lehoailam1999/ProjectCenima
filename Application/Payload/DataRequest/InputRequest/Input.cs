@@ -11,7 +11,5 @@ namespace Application.Payload.DataRequest.InputRequest
         public DateTime? StartAt { get; set; }
         public DateTime? EndAt { get; set; }
         public int? TotalMovieHighLight { get; set; }
-/*        public string HeroName { get; set; }
-*/
     }
 }

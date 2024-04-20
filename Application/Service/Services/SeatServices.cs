@@ -43,12 +43,13 @@ namespace Application.Service.Services
 
         public async Task<string> DeleteSeat(int id)
         {
-            var seatDelete = _baseSeatRepositories.FindAsync(id);
+            var seatDelete =await _baseSeatRepositories.FindAsync(id);
             if (seatDelete == null)
             {
-                return "NotFound";
+                return "Not found Seat";
             }
-            await _baseSeatRepositories.DeleteAsync(seatDelete.Id);
+            seatDelete.IsActive = false;
+            await _baseSeatRepositories.UpdateAsync(seatDelete);
             return "Delete Seat Successfully";
         }
 

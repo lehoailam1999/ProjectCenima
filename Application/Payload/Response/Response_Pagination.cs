@@ -35,10 +35,10 @@ namespace Application.Payload.Response
         public Response_Pagination<T> ResponseSuccess(string message, int pageSize, int pageNumber, List<T> data)
         {
             int totalItems = data.Count();
-            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageNumber);
 
             int startIndex = (pageNumber - 1) * pageSize;
-            List<T> pageData = data.Skip(startIndex).Take(pageSize).ToList();
+            List<T> pageData = data.Skip(startIndex).Take(pageNumber).ToList();
 
             return new Response_Pagination<T>()
             {

@@ -9,10 +9,6 @@ namespace Domain.InterfaceRepositories
 {
     public interface IProjectRepositories
     {
-        Task<Cinema> GetCinema(int id);
-        Task<Room> GetRoom(int id);
-        Task<SeatStatus> GetSeatStatus(int id);
-        Task<SeatType> GetSeatType(int id);
         Task<List<BillTicket>> GetAllBillTicket(int idBill);
         Task<List<BillFood>> GetAllBillFood(int idBill);
 

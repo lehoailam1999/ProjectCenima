@@ -58,10 +58,6 @@ namespace Infrastructure.ImplementRepositories
             return confirmEmail;
         }
 
-        /*public async Task<IEnumerable<User>> GetAllUser()
-        {
-            var listUser =await _context.Users.ToListAsync();
-            return listUser;
-        }*/
+       
     }
 }

@@ -45,12 +45,13 @@ namespace Application.Service.Services
 
         public async Task<string> DeleteRoom(int id)
         {
-            var roomDelete = _baseRoomRepositories.FindAsync(id);
+            var roomDelete =await _baseRoomRepositories.FindAsync(id);
             if (roomDelete == null)
             {
                 return "NotFound";
             }
-            await _baseRoomRepositories.DeleteAsync(roomDelete.Id);
+            roomDelete.IsActive = false;
+            await _baseRoomRepositories.UpdateAsync(roomDelete);
             return "Delete Seat Successfully";
         }
 

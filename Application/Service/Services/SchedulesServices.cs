@@ -37,23 +37,25 @@ namespace Application.Service.Services
         public async Task<ResponseObject<Response_Schedules>> AddNewSchedules(Request_Schedules request)
         {
             Schedule schedule= new Schedule();
-            var lstSchedule =  _baseSchedulesRepositories.Where(x => x.RoomId == request.RoomId);
-            if (lstSchedule == null && lstSchedule.Count==0)
-            {
-                return _respon.ResponseError(StatusCodes.Status404NotFound,"Not Found Room", null);
-
-            }
-            if (request.StartAt<request.EndAt)
+            
+            if (request.StartAt>request.EndAt)
             {
                 return _respon.ResponseError(StatusCodes.Status400BadRequest, "Thoi gian bat dau phai nho hon thoi gian ket thuc", null);
-
             }
-            var listCheck = lstSchedule.Where(x => x.StartAt <= request.StartAt && x.EndAt >= request.EndAt).ToList();
-            if (listCheck!=null&&listCheck.Count!=0)
+            var lstSchedulewithRooom = _baseSchedulesRepositories.Where(x => x.RoomId == request.RoomId ).ToList();
+
+            var listCheckInroom = lstSchedulewithRooom.Where(x => x.StartAt <= request.EndAt && x.EndAt >= request.StartAt).ToList();
+            if (listCheckInroom.Any())
             {
-                return _respon.ResponseError(StatusCodes.Status400BadRequest, "Da co phim chieu trong khoang thowi gian nay", null);
+                return _respon.ResponseError(StatusCodes.Status400BadRequest, "Đã có phim  được chếu trong khoang thời gian nay", null);
             }
+            var lstSchedule = _baseSchedulesRepositories.Where(x => x.RoomId == request.RoomId && x.MovieId == request.MovieId).ToList();
 
+            var listCheck = lstSchedule.Where(x => x.StartAt <= request.EndAt && x.EndAt >= request.StartAt).ToList();
+            if (listCheck.Any())
+            {
+                return _respon.ResponseError(StatusCodes.Status400BadRequest, "Phim này đã được chếu trong khoang thời gian nay", null);
+            }
             schedule.StartAt = request.StartAt;
             schedule.EndAt = request.EndAt;
             schedule.Code = Guid.NewGuid().ToString();
@@ -65,6 +67,7 @@ namespace Application.Service.Services
 
             }
             schedule.MovieId = request.MovieId;
+            schedule.IsActive = true;
             schedule.ticket = null;
             await _baseSchedulesRepositories.AddAsync(schedule);
             if (request.request_Tickets != null && request.request_Tickets.Any())
@@ -80,8 +83,6 @@ namespace Application.Service.Services
             }
             await _baseSchedulesRepositories.UpdateAsync(schedule);
             return _respon.ResponseSuccess("Add schedule Successfully", _converter.EntityToDTO(schedule));
-
-
         }
         public async Task<List<Ticket>> EntityToListTicket(int scheduleId, List<Request_Ticket> request)
         {
@@ -96,7 +97,7 @@ namespace Application.Service.Services
                 ticket.IsActive = true;
                 ticket.PriceTicket = item.PriceTicket;
                 ticket.SeatId = item.SeatId;
-                var seat = _baseSeatRepositories.FindAsync(item.SeatId);
+                var seat = await _baseSeatRepositories.FindAsync(item.SeatId);
                 if (seat==null)
                 {
                     return null;
@@ -113,9 +114,10 @@ namespace Application.Service.Services
             var scheduleDelete =await _baseSchedulesRepositories.FindAsync(id);
             if (scheduleDelete == null)
             {
-                return "Not Found";
+                return "Not Found schedule";
             }
-            await _baseSchedulesRepositories.DeleteAsync(scheduleDelete.Id);
+            scheduleDelete.IsActive = false;
+            await _baseSchedulesRepositories.UpdateAsync(scheduleDelete);
             return "Delete Schedule Successfully";
         }
 
@@ -126,9 +128,15 @@ namespace Application.Service.Services
             return listRes.ResponseSuccess("Danh sach Schedule", _converter.EntityToListDTO(list));
         }
 
-        public Task<ResponseObject<Response_Schedules>> UpdateSchedules(int id)
+        public async Task<ResponseObject<Response_Schedules>> UpdateSchedules(int id)
         {
-            throw new NotImplementedException();
+            var scheduleUpdate = await _baseSchedulesRepositories.FindAsync(id);
+            if (scheduleUpdate == null)
+            {
+                return _respon.ResponseError(StatusCodes.Status404NotFound,"Không tìm thấy lịch",null);
+            }
+            await _baseSchedulesRepositories.UpdateAsync(scheduleUpdate);
+            return _respon.ResponseSuccess( "Update thành công", _converter.EntityToDTO(scheduleUpdate));
         }
     }
 }

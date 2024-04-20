@@ -102,6 +102,8 @@ builder.Services.AddScoped<Converter_Ticket>();
 //seat
 builder.Services.AddScoped<IBaseRepositories<Seat>, BaseRepositories<Seat>>();
 
+
+builder.Services.AddSingleton<IVnPayService, VnPayService>();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;

@@ -47,7 +47,8 @@ namespace Application.Service.Services
             {
                 return "Not Found";
             }
-           await _baseCinemaRepositories.DeleteAsync(id);
+            cinemaDelete.IsActive = false;
+            await _baseCinemaRepositories.UpdateAsync(cinemaDelete);
             return "Delete Cinema Successfully";
               
            

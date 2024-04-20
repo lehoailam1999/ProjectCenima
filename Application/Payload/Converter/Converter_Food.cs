@@ -24,14 +24,30 @@ namespace Application.Payload.Converter
         }
         public List<Response_Food> EntityToListDTO(List<Food> listFood)
         {
-            return listFood.Select(item => new Response_Food
+            /* return listFood.Select(item => new Response_Food
+             {
+                 Id = item.Id,
+                 Price = item.Price,
+                 Description = item.Description,
+                 Image = item.Image,
+                 NameofFood = item.NameofFood
+             }).ToList();*/
+            List<Response_Food> list = new List<Response_Food>();
+            foreach (var item in listFood)
             {
-                Id = item.Id,
-                Price = item.Price,
-                Description = item.Description,
-                Image = item.Image,
-                NameofFood = item.NameofFood
-            }).ToList();
+                Response_Food response = new Response_Food()
+                {
+                    Id = item.Id,
+                    Price = item.Price,
+                    Description = item.Description,
+                    Image = item.Image,
+                    NameofFood = item.NameofFood
+                };
+       
+                list.Add(response);
+            }
+            return list;
         }
+    
     }
 }
