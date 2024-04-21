@@ -2,6 +2,8 @@
 using Application.Payload.DataRequest;
 using Application.Payload.DataResponse;
 using Application.Service.IServices;
+using Domain.Entities;
+using Domain.InterfaceRepositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -15,39 +17,41 @@ namespace Application.Service.Services
     public class VnPayService : IVnPayService
     {
         private readonly IConfiguration _config;
+        private readonly IBaseRepositories<Bill> _baseBillRepositories;
 
-        public VnPayService(IConfiguration config)
+        public VnPayService(IConfiguration config, IBaseRepositories<Bill> baseRepositories)
         {
             _config = config;
+            _baseBillRepositories = baseRepositories;
         }
 
-        public string CreatePaymentUrl(HttpContext context, VnPaymentRequestModel model)
+        public async Task<string> CreatePaymentUrl(HttpContext context, VnPaymentRequestModel model, int billId)
         {
-            var tick = DateTime.Now.Ticks.ToString();
-
+/*            var tick = DateTime.Now.Ticks.ToString();
+*/
             var vnpay = new VnPayLibrary();
+            var bill = await _baseBillRepositories.FindAsync(billId);
             vnpay.AddRequestData("vnp_Version", _config["VnPay:Version"]);
             vnpay.AddRequestData("vnp_Command", _config["VnPay:Command"]);
             vnpay.AddRequestData("vnp_TmnCode", _config["VnPay:TmnCode"]);
-            vnpay.AddRequestData("vnp_Amount", (model.Amount * 100).ToString()); //Số tiền thanh toán. Số tiền không mang các ký tự phân tách thập phân, phần nghìn, ký tự tiền tệ. Để gửi số tiền thanh toán là 100,000 VND (một trăm nghìn VNĐ) thì merchant cần nhân thêm 100 lần (khử phần thập phân), sau đó gửi sang VNPAY là: 10000000
-
+            vnpay.AddRequestData("vnp_Amount", (model.Amount * 100).ToString());
             vnpay.AddRequestData("vnp_CreateDate", model.CreatedDate.ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", _config["VnPay:CurrCode"]);
             vnpay.AddRequestData("vnp_IpAddr", Utils.GetIpAddress(context));
             vnpay.AddRequestData("vnp_Locale", _config["VnPay:Locale"]);
 
-            vnpay.AddRequestData("vnp_OrderInfo", "Thanh toán cho đơn hàng:" + model.OrderId);
+            vnpay.AddRequestData("vnp_OrderInfo","Thanh toán cho hóa đơn:"+bill.UpdateTime);
             vnpay.AddRequestData("vnp_OrderType", "other"); //default value: other
             vnpay.AddRequestData("vnp_ReturnUrl", _config["VnPay:PaymentBackReturnUrl"]);
 
-            vnpay.AddRequestData("vnp_TxnRef", tick); // Mã tham chiếu của giao dịch tại hệ thống của merchant. Mã này là duy nhất dùng để phân biệt các đơn hàng gửi sang VNPAY. Không được trùng lặp trong ngày
+            vnpay.AddRequestData("vnp_TxnRef", bill.Id.ToString()); // Mã tham chiếu của giao dịch tại hệ thống của merchant. Mã này là duy nhất dùng để phân biệt các đơn hàng gửi sang VNPAY. Không được trùng lặp trong ngày
 
             var paymentUrl = vnpay.CreateRequestUrl(_config["VnPay:BaseUrl"], _config["VnPay:HashSecret"]);
 
             return paymentUrl;
         }
 
-        public VnPaymentResponseModel PaymentExecute(IQueryCollection collections)
+        public  VnPaymentResponseModel PaymentExecute(IQueryCollection collections)
         {
             var vnpay = new VnPayLibrary();
             foreach (var (key, value) in collections)
@@ -57,7 +61,6 @@ namespace Application.Service.Services
                     vnpay.AddResponseData(key, value.ToString());
                 }
             }
-           
             var vnp_orderId = Convert.ToInt64(vnpay.GetResponseData("vnp_TxnRef"));
             var vnp_TransactionId = Convert.ToInt64(vnpay.GetResponseData("vnp_TransactionNo"));
             var vnp_SecureHash = collections.FirstOrDefault(p => p.Key == "vnp_SecureHash").Value;
@@ -81,7 +84,7 @@ namespace Application.Service.Services
                 OrderId = vnp_orderId.ToString(),
                 TransactionId = vnp_TransactionId.ToString(),
                 Token = vnp_SecureHash,
-                VnPayResponseCode = vnp_ResponseCode
+                VnPayResponseCode = vnp_ResponseCode,
             };
         }
     }

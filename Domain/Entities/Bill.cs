@@ -9,6 +9,7 @@ namespace Domain.Entities
 {
     public class Bill:BaseEntity
     {
+        public int Id { get; set; }
         public double ToTalDouble { get; set; }
         public string TradingCode { get; set; }
         public DateTime CreateTime { get; set; }

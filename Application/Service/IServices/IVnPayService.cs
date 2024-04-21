@@ -11,7 +11,7 @@ namespace Application.Service.IServices
 {
     public interface IVnPayService
     {
-        string CreatePaymentUrl(HttpContext context, VnPaymentRequestModel model);
-        VnPaymentResponseModel PaymentExecute(IQueryCollection collections);
+        Task<string> CreatePaymentUrl(HttpContext context, VnPaymentRequestModel model,int billId);
+        VnPaymentResponseModel PaymentExecute(IQueryCollection collections);  
     }
 }

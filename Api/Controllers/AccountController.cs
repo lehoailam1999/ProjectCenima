@@ -47,6 +47,7 @@ namespace Api.Controllers
         {
             int id = int.Parse(HttpContext.User.FindFirst("Id").Value);
 
+
             return Ok(await _service.ChangePassWord(id, request));
         }
         [HttpPost("ForgotPassword")]

@@ -103,7 +103,7 @@ builder.Services.AddScoped<Converter_Ticket>();
 builder.Services.AddScoped<IBaseRepositories<Seat>, BaseRepositories<Seat>>();
 
 
-builder.Services.AddSingleton<IVnPayService, VnPayService>();
+builder.Services.AddScoped<IVnPayService, VnPayService>();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
@@ -144,8 +144,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            ValidateIssuer = false,
-            ValidateAudience = false,
+            ValidateIssuer = true,
+            ValidateAudience = true,
             IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:SecretKey").Value!))
         };
 
