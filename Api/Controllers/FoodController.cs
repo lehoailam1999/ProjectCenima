@@ -17,9 +17,9 @@ namespace Api.Controllers
             _foodServices = foodServices;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllFood(int pageSize = 1, int pageNumber = 5)
+        public async Task<IActionResult> GetAllFood(int pageNumber = 1, int pageSize = 5)
         {
-            var listFood = await _foodServices.GetAll(pageSize, pageNumber);
+            var listFood = await _foodServices.GetAll(pageNumber, pageSize);
             return Ok(listFood);
         }
        

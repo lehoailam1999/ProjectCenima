@@ -59,6 +59,8 @@ builder.Services.AddScoped<Converter_Room>();
 builder.Services.AddScoped<IFoodServices, FoodServices>();
 builder.Services.AddTransient<IBaseRepositories<Food>, BaseRepositories<Food>>();
 builder.Services.AddScoped<ResponseObject<Response_Food>>();
+builder.Services.AddScoped<ResponseObject<List<Response_Food>>>();
+
 builder.Services.AddScoped<Converter_Food>();
 //Schedule
 builder.Services.AddScoped<ISchedulesServices, SchedulesServices>();
@@ -94,6 +96,7 @@ builder.Services.AddScoped<IProjectRepositories,ProjectRepositories>();
 
 builder.Services.AddScoped<IBaseRepositories<BillFood>, BaseRepositories<BillFood>>();
 builder.Services.AddScoped<Convert_BillFood>();
+builder.Services.AddScoped<Response_Pagination<Response_Food>>();
 
 //ticket
 builder.Services.AddScoped<IBaseRepositories<Ticket>, BaseRepositories<Ticket>>();
@@ -101,6 +104,10 @@ builder.Services.AddScoped<IBaseRepositories<Promotion>, BaseRepositories<Promot
 builder.Services.AddScoped<Converter_Ticket>();
 //seat
 builder.Services.AddScoped<IBaseRepositories<Seat>, BaseRepositories<Seat>>();
+//Income
+builder.Services.AddScoped<IIncomeRepositories, IncomeRepositories>();
+builder.Services.AddScoped<IIncomeServices, IncomeServices>();
+builder.Services.AddScoped<ResponseObject<List<Response_Revenue>>>();
 
 
 builder.Services.AddScoped<IVnPayService, VnPayService>();
@@ -144,8 +151,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            ValidateIssuer = true,
-            ValidateAudience = true,
+            ValidateIssuer = false,
+            ValidateAudience = false,
             IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:SecretKey").Value!))
         };
 

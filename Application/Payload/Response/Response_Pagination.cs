@@ -32,13 +32,13 @@ namespace Application.Payload.Response
         {
         }
 
-        public Response_Pagination<T> ResponseSuccess(string message, int pageSize, int pageNumber, List<T> data)
+        public Response_Pagination<T> ResponseSuccess(string message, int pageNumber, int pageSize, List<T> data)
         {
             int totalItems = data.Count();
-            int totalPages = (int)Math.Ceiling((double)totalItems / pageNumber);
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
 
             int startIndex = (pageNumber - 1) * pageSize;
-            List<T> pageData = data.Skip(startIndex).Take(pageNumber).ToList();
+            List<T> pageData = data.Skip(startIndex).Take(pageSize).ToList();
 
             return new Response_Pagination<T>()
             {

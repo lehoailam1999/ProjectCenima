@@ -20,7 +20,5 @@ namespace Domain.Entities
         public Movie movie { get; set; }
         public bool IsActive { get; set; }
         public IEnumerable<Ticket>? ticket { get; set; }
-
-
     }
 }

@@ -55,10 +55,10 @@ namespace Application.Service.Services
             return "Delete Seat Successfully";
         }
 
-        public async Task<Response_Pagination<Response_Room>> GetAll(int pageSize,int pageNumber)
+        public async Task<Response_Pagination<Response_Room>> GetAll(int pageNumber,int pageSize)
         {
             var list = await _baseRoomRepositories.GetAll();
-            return _respon_pagination.ResponseSuccess("Danh sach Room",pageSize,pageNumber, _converter.EntityToListDTO(list));
+            return _respon_pagination.ResponseSuccess("Danh sach Room",pageNumber, pageSize, _converter.EntityToListDTO(list));
         }
 
         public async Task<ResponseObject<Response_Room>> UpdateRoom(int id)

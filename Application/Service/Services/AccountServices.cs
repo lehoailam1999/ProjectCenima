@@ -145,17 +145,6 @@ namespace Application.Service.Services
             }
             user.UserName = request.UserName;
             user.Point = request.Point;
-            //Check password
-           /* if (!ValidateInput.IsValidPassword(request.Password))
-            {
-                return new ResponseObject<Response_Resgister>
-                {
-                    Status = StatusCodes.Status400BadRequest,
-                    Message = "Password does not meet the required criteria.",
-                    Data = null
-                };
-            }*/
-
             user.Password = BcryptNet.HashPassword(request.Password);
             var userWithPhone =await _userRepositories.GetUserByPhoneNumber(request.PhoneNumber);
             if (userWithPhone != null)
@@ -167,15 +156,6 @@ namespace Application.Service.Services
                     Data = null
                 };
             }
-            /*if (!ValidateInput.IsValidPhoneNumber(request.PhoneNumber))
-            {
-                return new ResponseObject<Response_Resgister>
-                {
-                    Status = StatusCodes.Status400BadRequest,
-                    Message = "Phone Number contains 10 digits",
-                    Data = null
-                };
-            }*/
             user.PhoneNumber = request.PhoneNumber;
             var userWithEmail = await _userRepositories.GetUserByEmail(request.Email);
             if (userWithEmail != null)
@@ -190,16 +170,12 @@ namespace Application.Service.Services
             user.Email = request.Email;
             user.IsActive = true;
             user.RoleId = 1;
-            user.UserStatusId = 2;//
+            user.UserStatusId = 2;
             user.RankCustomerId = 1;
             await _baseRepositories.AddAsync(user);
-            /*_context.Users.Add(user);
-            await _context.SaveChangesAsync();*/
             Random rand = new Random();
             int randomNumber = rand.Next(1000, 10000);
-
             string confirmationToken = randomNumber.ToString();
-
             ConfirmEmail confirmEmail = new ConfirmEmail
             {
                 UserId = user.Id,
@@ -207,14 +183,11 @@ namespace Application.Service.Services
                 ExpiredTime = DateTime.UtcNow.AddHours(24),
                 IsConfirm = false
             };
-
-            /*            _context.ConfirmEmails.Add(confirmEmail);
-            */
             await _baseConfirmRepositories.AddAsync(confirmEmail);
             string subject = "Test";
             string body = "Xin chào :" + confirmationToken;
             string emailResult = _emailServices.SendEmail(user.Email, subject, body);
-            return _response.ResponseSuccess($"Đăng ký tài khoản thành công. Vui lòng kiểm tra email để xác nhận đăng ký.{emailResult}",await _converter.EntityToDTO(user));
+            return _response.ResponseSuccess($" Vui lòng kiểm tra email để xác nhận đăng ký.{emailResult}",await _converter.EntityToDTO(user));
         }
         public async Task<ResponseObject<ConfirmEmail>> ConfirmEmail(string code)
         {
@@ -238,14 +211,12 @@ namespace Application.Service.Services
 
             user.UserStatusId = 1;
             await _baseRepositories.UpdateAsync(user);
-
             // Update ConfirmEmail
             confirmEmail.IsConfirm = true;
             await _baseConfirmRepositories.UpdateAsync(confirmEmail);
 
             return _response.ResponseSuccess("Xác nhận email thành công",null);
         }
-
         public async Task<string> ReNewCode(string email)
         {
             var userWithEmail = await _userRepositories.GetUserByEmail(email);
@@ -282,6 +253,10 @@ namespace Application.Service.Services
         public async Task<string> ChangePassWord(int id, Request_ChangePassword request)
         {
             var user = await _baseRepositories.FindAsync(id);
+            if (user==null)
+            {
+                return "Bạn không đăng trong phiên đăn nhập";
+            }
             bool checkPassword = BcryptNet.Verify(request.OldPassword, user.Password);
             if (!checkPassword)
             {
@@ -295,17 +270,16 @@ namespace Application.Service.Services
             await _baseRepositories.UpdateAsync(user);
             return "Change password success";
         }
-
         public async Task<string> ForgotPassword(string email)
         {
-           var userWithEmail = await _userRepositories.GetUserByEmail(email);
-            if (userWithEmail==null)
+            var userWithEmail = await _userRepositories.GetUserByEmail(email);
+            if (userWithEmail == null)
             {
                 return "Email don't exists!!!!";
             }
             var cofirmithUserId = await _userRepositories.GetConfirmEmailByUserId(userWithEmail.Id);
             bool delete = await _baseConfirmRepositories.DeleteAsync(cofirmithUserId.Id);
-            if (delete ==true)
+            if (delete == true)
             {
                 Random rand = new Random();
                 int randomNumber = rand.Next(1000, 10000);
@@ -328,7 +302,6 @@ namespace Application.Service.Services
                 return "Bạn chưa gửi được mã xác nhận";
             }
         }
-
         public async Task<string> ConfirmCreateNewPasWord(Request_NewPassWord request)
         {
             try
@@ -351,19 +324,14 @@ namespace Application.Service.Services
             }
             catch (Exception ex)
             {
-
                 return "Error: " + ex.Message;
             }
-
-
         }
-
         public async Task<IEnumerable<User>> GetAllUser()
         {
             var list =await _baseRepositories.GetAll();
             return list;
         }
-
         public async Task<string> DeleteUser(int id)
         {
           var delete = await _baseRepositories.FindAsync(id);

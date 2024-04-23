@@ -19,9 +19,9 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllSeat(int pageSize=1,int pageNumber=5)
+        public async Task<IActionResult> GetAllSeat(int pageNumber = 1, int pageSize = 5)
         {
-            var listSeat = await _seatServices.GetAll(pageSize,pageNumber);
+            var listSeat = await _seatServices.GetAll(pageNumber, pageSize);
             return Ok(listSeat);
         }
         [HttpGet("GetAllSeatRoom")]

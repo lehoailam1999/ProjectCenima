@@ -19,12 +19,14 @@ namespace Application.Service.Services
         private readonly IBaseRepositories<Food> _baseFoodRepositories;
         private readonly Converter_Food _converter;
         private readonly ResponseObject<Response_Food> _respon;
+        Response_Pagination<Response_Food> _listRes;
 
-        public FoodServices(IBaseRepositories<Food> baseFoodRepositories, Converter_Food converter, ResponseObject<Response_Food> respon)
+        public FoodServices(IBaseRepositories<Food> baseFoodRepositories, Converter_Food converter, ResponseObject<Response_Food> respon, Response_Pagination<Response_Food> listRes)
         {
             _baseFoodRepositories = baseFoodRepositories;
             _converter = converter;
             _respon = respon;
+            _listRes = listRes;
         }
 
         public async Task<ResponseObject<Response_Food>> AddNewFood(Request_Food request)
@@ -53,9 +55,8 @@ namespace Application.Service.Services
 
         public async Task<Response_Pagination<Response_Food>> GetAll(int pageSize,int pageNumber)
         {
-            Response_Pagination<Response_Food> listRes = new Response_Pagination<Response_Food>();
             var list = await _baseFoodRepositories.GetAll();
-            return listRes.ResponseSuccess("Danh sach Food",pageSize,pageNumber, _converter.EntityToListDTO(list));
+            return _listRes.ResponseSuccess("Danh sach Food",pageSize,pageNumber, _converter.EntityToListDTO(list));
         }
 
         public async Task<ResponseObject<Response_Food>> UpdateFood(int id)

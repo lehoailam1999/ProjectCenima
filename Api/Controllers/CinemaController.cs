@@ -18,9 +18,9 @@ namespace Api.Controllers
         }
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAllCinema(int pageSize=1,int pageNumber=5)
+        public async Task<IActionResult> GetAllCinema(int pageNumber=1,int pageSize = 5)
         {
-            var listCinema =await _cenimaServices.GetAll(pageSize,pageNumber);
+            var listCinema =await _cenimaServices.GetAll(pageNumber,pageSize);
             return Ok(listCinema);
         }
         [HttpPost]

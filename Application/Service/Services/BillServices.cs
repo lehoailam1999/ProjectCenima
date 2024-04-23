@@ -150,7 +150,7 @@ namespace Application.Service.Services
             return "Xóa bill thành công";
         }
 
-        public async Task<Response_Pagination<Response_Bill>> GetAll(int pageSize, int pageNumber)
+        public async Task<Response_Pagination<Response_Bill>> GetAll(int pageNumber, int pageSize)
         {
             Response_Pagination<Response_Bill> response_Pagination = new Response_Pagination<Response_Bill>();
             var listBill= await _baseRepositories.GetAll();
@@ -158,7 +158,7 @@ namespace Application.Service.Services
             {
                 return response_Pagination.ResponseError(StatusCodes.Status404NotFound, "Phân trang không thành công");
             }
-            return response_Pagination.ResponseSuccess("Danh sách :", pageSize, pageNumber, _converter.EntityToListDTO(listBill));
+            return response_Pagination.ResponseSuccess("Danh sách :", pageNumber, pageSize, _converter.EntityToListDTO(listBill));
         }
 
         public Task<ResponseObject<Request_Bill>> UpdateFood(int id)

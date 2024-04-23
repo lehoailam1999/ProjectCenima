@@ -36,9 +36,9 @@ namespace Api.Controllers
             return Ok(bill);
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllBill(int pageSize=1, int pageNumber=5)
+        public async Task<IActionResult> GetAllBill(int pageNumber=1, int pageSize =5)
         {
-            var bill = await _billServices.GetAll(pageSize,pageNumber);
+            var bill = await _billServices.GetAll(pageNumber,pageSize);
             return Ok(bill);
         }
         [HttpDelete]
@@ -73,7 +73,7 @@ namespace Api.Controllers
             return Ok(new { status=StatusCodes.Status200OK,message="Moi ban thanh toan online",url= await _vnPayService.CreatePaymentUrl(HttpContext, vnPayModel,id) });
         }
         [HttpGet("PaymentCallBack")]
-        public async  Task<IActionResult> PaymentCallBack()
+        public async Task<IActionResult> PaymentCallBack()
         {
             var response =  _vnPayService.PaymentExecute(Request.Query);
 
@@ -90,7 +90,7 @@ namespace Api.Controllers
            
             bill.BillStatusId = 1;
             await _baseBillRepositories.UpdateAsync(bill);
-            return Ok(new { status = StatusCodes.Status200OK, message = "Thanh toán VNPay thành công",/*data=_converter.EntityToDTO(bill)}*/data = response });
+            return Ok(new { status = StatusCodes.Status200OK, message = "Thanh toán VNPay thành công", data = _converter.EntityToDTO(bill)});
         }
     }
 }

@@ -47,7 +47,6 @@ namespace Api.Controllers
         {
             int id = int.Parse(HttpContext.User.FindFirst("Id").Value);
 
-
             return Ok(await _service.ChangePassWord(id, request));
         }
         [HttpPost("ForgotPassword")]
@@ -74,6 +73,8 @@ namespace Api.Controllers
             return Ok(list);
         }
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> DeleteAsync(int id)
         {
             var delete = await _service.DeleteUser(id);

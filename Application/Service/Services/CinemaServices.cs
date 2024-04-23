@@ -60,7 +60,7 @@ namespace Application.Service.Services
             var list=await _baseCinemaRepositories.GetAll();
             if (list==null&& list.Count==0)
             {
-                listRes.ResponseError(StatusCodes.Status404NotFound, "Danh sach cinema bị lỗi");
+                return listRes.ResponseError(StatusCodes.Status404NotFound, "Danh sach cinema bị lỗi");
             }
             return listRes.ResponseSuccess("Danh sach Cinema",pageSize,pageNumber, _converter.EntityToListDTO(list));
         }
