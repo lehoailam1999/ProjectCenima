@@ -1,6 +1,7 @@
 ﻿using Application.Payload.DataRequest;
 using Application.Service.IServices;
 using Application.Service.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,7 +28,6 @@ namespace Api.Controllers
        
         [HttpPost]
         [Authorize(Roles = "Admin")]
-
         public async Task<IActionResult> AddNewFood(Request_Food request)
         {
             var food = await _foodServices.AddNewFood(request);
@@ -35,7 +35,6 @@ namespace Api.Controllers
         }
         [HttpPut]
         [Authorize(Roles = "Admin")]
-
         public async Task<IActionResult> UpdateFood(int id)
         {
             var food = await _foodServices.UpdateFood(id);

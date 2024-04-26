@@ -30,6 +30,7 @@ namespace Api.Controllers
             return Ok(listCinema);
         }
         [HttpPost]
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> AddNewCinema(Request_Cinema request)
         {
@@ -37,12 +38,15 @@ namespace Api.Controllers
             return Ok(cinema);
         }
         [HttpPut]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> UpdateCinema(int id, Request_Cinema request)
         {
             var cinema =await _cenimaServices.UpdateCinema(id,request);
             return Ok(cinema);
         }
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> DeleteCinema(int id)
         {
