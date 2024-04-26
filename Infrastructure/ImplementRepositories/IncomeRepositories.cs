@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Domain.Enumerates;
 using Domain.InterfaceRepositories;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -23,16 +24,17 @@ namespace Infrastructure.ImplementRepositories
         {
             var sevenDaysAgo = DateTime.Now.AddDays(-7);
 
-            var recentBills = _context.Bills
+            var recentBills = await _context.Bills
                 .Where(b => b.CreateTime >= sevenDaysAgo&& b.BillStatusId==1)
                 .Include(b => b.billFood)
-                    .ThenInclude(bf => bf.food)
-                .ToList();
+                .ThenInclude(bf => bf.food)
+                .ToListAsync();
             if (recentBills==null&&recentBills.Count==0)
             {
                 return null;
             }
-            var foodSales = recentBills.SelectMany(b => b.billFood)
+            var foodSales = recentBills
+                .SelectMany(b => b.billFood)
                 .GroupBy(bf => bf.food.Id)
                 .Select(g => new 
                 {
@@ -44,7 +46,8 @@ namespace Infrastructure.ImplementRepositories
             {
                 return null;
             }
-            var mostPopularFoods = foodSales.OrderByDescending(fs => fs.TotalQuantity)
+            var mostPopularFoods = foodSales
+                .OrderByDescending(fs => fs.TotalQuantity)
                 .Take(itemAmount) 
                 .Select(fs => _context.Foods.Find(fs.FoodId))
                 .ToList();
@@ -55,23 +58,34 @@ namespace Infrastructure.ImplementRepositories
             return mostPopularFoods;
         }
 
-        public async Task<List<Bill>> GetIncome()
+        public async Task<List<CinemaRevenue>> GetIncome(DateTime startAt, DateTime endAt)
         {
-            var cinemaSales = await _context.Bills
-                .Include(b => b.billTicket)
-            .ThenInclude(bt => bt.ticket)
-                .ThenInclude(t => t.schedule)
-                    .ThenInclude(sc => sc.movie) // Truy cập movie từ schedule
-                        .ThenInclude(m => m.schedule) // Truy cập schedule từ movie (nếu cần)
-                            .ThenInclude(s => s.room) // Truy cập room từ schedule
-                                .ThenInclude(r => r.cinema) // Truy cập cinema từ room
-                .ToListAsync();
-            if (cinemaSales == null && cinemaSales.Count == 0)
+            /*var cinemaSales = await _context.Bills
+               .Include(b => b.billTicket)
+                   .ThenInclude(bt => bt.ticket)
+                       .ThenInclude(t => t.schedule)
+                             .ThenInclude(s => s.room)
+                                  .ThenInclude(r => r.cinema)
+               .ToListAsync();*/
+            
+            var listCinema = await _context.Bills
+                    .AsNoTracking()
+                    .Where(b => b.CreateTime >= startAt && b.CreateTime <= endAt && b.BillStatusId == 1)
+                    .GroupBy(b => b.billTicket.FirstOrDefault().ticket.schedule.room.cinema.Id)
+                    .Select(g => new CinemaRevenue
+                    {
+                        Id = g.FirstOrDefault().billTicket.FirstOrDefault().ticket.schedule.room.cinema.Id,
+                        NameOfCinema = g.FirstOrDefault().billTicket.FirstOrDefault().ticket.schedule.room.cinema.NameOfCinema,
+                        Address = g.FirstOrDefault().billTicket.FirstOrDefault().ticket.schedule.room.cinema.Address,
+                        Description = g.FirstOrDefault().billTicket.FirstOrDefault().ticket.schedule.room.cinema.Description,
+                        TotalRevenue = g.Sum(b => b.ToTalDouble)
+                    })
+                    .ToListAsync();
+            if (listCinema == null && listCinema.Count == 0)
             {
                 return null;
             }
-
-            return cinemaSales;
+            return listCinema;
         }
     }
 }

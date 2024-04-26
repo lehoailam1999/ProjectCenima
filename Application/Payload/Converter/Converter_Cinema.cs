@@ -14,6 +14,7 @@ namespace Application.Payload.Converter
         {
             Response_Cinema response = new Response_Cinema()
             {
+                Id=cinema.Id,
                 Address = cinema.Address,
                 Code = cinema.Code,
                 NameOfCinema = cinema.NameOfCinema,
@@ -25,6 +26,7 @@ namespace Application.Payload.Converter
         {
             return listcinema.Select(item => new Response_Cinema
             {
+                Id=item.Id,
                 Address = item.Address,
                 Code = item.Code,
                 NameOfCinema = item.NameOfCinema,

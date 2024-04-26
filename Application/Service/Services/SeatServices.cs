@@ -69,7 +69,7 @@ namespace Application.Service.Services
                 return listRes.ResponseError(StatusCodes.Status404NotFound,"Phòng chưa có ghể", null);
 
             }
-            return listRes.ResponseSuccess("Danh sach ghế trong  phòng", _converter.EntityToListDTO(listSeatInRoom));
+            return listRes.ResponseSuccess("Danh sach ghế trong phòng", _converter.EntityToListDTO(listSeatInRoom));
 
         }
 

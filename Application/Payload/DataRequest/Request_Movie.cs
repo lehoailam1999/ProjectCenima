@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -13,7 +14,7 @@ namespace Application.Payload.DataRequest
         public int MovieDuration { get; set; }
         public string Description { get; set; }
         public string Director { get; set; }
-        public string Image { get; set; }
+        public IFormFile Image { get; set; }
         public string HeroImage { get; set; }
         public string Language { get; set; }
         public string Name { get; set; }

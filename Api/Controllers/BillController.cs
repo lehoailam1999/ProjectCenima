@@ -36,6 +36,8 @@ namespace Api.Controllers
             return Ok(bill);
         }
         [HttpGet]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> GetAllBill(int pageNumber=1, int pageSize =5)
         {
             var bill = await _billServices.GetAll(pageNumber,pageSize);
@@ -60,7 +62,6 @@ namespace Api.Controllers
             if (bill.BillStatusId == 1)
             {
                 return NotFound(new { message = "This bill has already been paid." });
-
             }
             var vnPayModel = new VnPaymentRequestModel
             {

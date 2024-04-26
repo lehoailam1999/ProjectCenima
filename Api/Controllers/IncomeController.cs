@@ -25,15 +25,13 @@ namespace Api.Controllers
         }
 
         [HttpGet("Income")]
-        [Authorize(Roles = "Admin")]
-
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> Income(DateTime startAt, DateTime endAt)
         {
             var list = await _services.GetIncome(startAt, endAt);
             return Ok(list);
         }
         [HttpGet("GetFoodHighLight")]
-        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> GetFoodHighLight(int itemAmout)
         {
             var list = await _services.GetFoodHighLight(itemAmout);

@@ -21,12 +21,14 @@ namespace Application.Service.Services
         private readonly IBaseRepositories<Movie> _baseMovieRepositories;
         private readonly Converter_Movie _converter;
         private readonly ResponseObject<Response_Movie> _respon;
+        private readonly IPhotoServices _photoServices;
 
-        public MovieServices(IBaseRepositories<Movie> baseMovieRepositories, Converter_Movie converter, ResponseObject<Response_Movie> respon)
+        public MovieServices(IBaseRepositories<Movie> baseMovieRepositories, Converter_Movie converter, ResponseObject<Response_Movie> respon, IPhotoServices photoServices)
         {
             _baseMovieRepositories = baseMovieRepositories;
             _converter = converter;
             _respon = respon;
+            _photoServices = photoServices;
         }
 
         public async Task<ResponseObject<Response_Movie>> AddNewMovie(Request_Movie request)
@@ -37,7 +39,7 @@ namespace Application.Service.Services
             movie.EndTime = DateTime.Now;
             movie.PremiereDate = DateTime.Now;
             movie.Director = request.Director;
-            movie.Image = request.Image;
+            movie.Image = await _photoServices.UploadPhoToAsync(request.Image);
             movie.HeroImage = request.HeroImage;
             movie.Language = request.Language;
             movie.Name = request.Name;

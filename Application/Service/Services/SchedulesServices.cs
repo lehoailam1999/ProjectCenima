@@ -138,5 +138,14 @@ namespace Application.Service.Services
             await _baseSchedulesRepositories.UpdateAsync(scheduleUpdate);
             return _respon.ResponseSuccess( "Update thành công", _converter.EntityToDTO(scheduleUpdate));
         }
+
+        public async Task<ResponseObject<List<Response_Schedules>>> GetAllById(int idMovie)
+        { 
+            ResponseObject<List<Response_Schedules>> listRes = new ResponseObject<List<Response_Schedules>>();
+
+            var listWithIdMovie = await _baseSchedulesRepositories.GetAllByID(x=>x.MovieId==idMovie);
+            return listRes.ResponseSuccess("Danh sach Schedule", _converter.EntityToListDTO(listWithIdMovie));
+
+        }
     }
 }

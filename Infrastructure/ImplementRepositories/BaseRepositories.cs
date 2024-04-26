@@ -99,6 +99,11 @@ namespace Infrastructure.ImplementRepositories
             var listData = await DBSet.ToListAsync();
             return listData;
         }
+        public async Task<List<TEntity>> GetAllByID(Expression<Func<TEntity, bool>> predicate)
+        {
+            var listData = await DBSet.Where(predicate).ToListAsync();
+            return listData;
+        }
 
         public async Task<TEntity> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
         {

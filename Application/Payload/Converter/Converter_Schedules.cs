@@ -29,11 +29,12 @@ namespace Application.Payload.Converter
         {
             Response_Schedules response = new Response_Schedules()
             {
+                Id=schedule.Id,
                 StartAt = schedule.StartAt,
                 EndAt = schedule.EndAt,
                 Code = schedule.Code,
-                RoomName = _baseRoomRepositories.SingleOrDefault(x=>x.Id==schedule.RoomId).Name,
-                MovieName = _baseMovieRepositories.SingleOrDefault(x=>x.Id==schedule.MovieId).Name
+                IdRoom=schedule.RoomId,
+                IdMovie= schedule.MovieId
 
             };
             if (schedule.Id != null)
@@ -41,14 +42,38 @@ namespace Application.Payload.Converter
                 var ticket = _baseTicketRepositories.Where(x => x.ScheduleId == schedule.Id);
                 if (ticket != null)
                 {
-                    response.request_Tickets = ticket.Select(bt => _converter.EntityToDTO(bt)).ToList();
+                    response.response_Tickets = ticket.Select(bt => _converter.EntityToDTO(bt)).ToList();
                 }
             }
             return response;
         }
         public List<Response_Schedules> EntityToListDTO(List<Schedule> listSchedules)
         {
-            return listSchedules.Select(item => new Response_Schedules
+            List<Response_Schedules> list = new List<Response_Schedules>();
+            foreach (var item in listSchedules)
+            {
+                Response_Schedules response = new Response_Schedules()
+                {
+                    Id=item.Id,
+                    StartAt = item.StartAt,
+                    EndAt = item.EndAt,
+                    Code = item.Code,
+                    IdRoom = item.RoomId,
+                    IdMovie = item.MovieId
+
+                };
+                if (item.Id != null)
+                {
+                    var ticket = _baseTicketRepositories.Where(x => x.ScheduleId == item.Id);
+                    if (ticket != null)
+                    {
+                        response.response_Tickets = ticket.Select(bt => _converter.EntityToDTO(bt)).ToList();
+                    }
+                }
+                list.Add(response);
+            }
+            return list;
+           /* return listSchedules.Select(item => new Response_Schedules
             {
                 StartAt = item.StartAt,
                 EndAt = item.EndAt,
@@ -56,7 +81,7 @@ namespace Application.Payload.Converter
                 RoomName = _baseRoomRepositories.SingleOrDefault(x => x.Id == item.RoomId).Name,
                 MovieName = _baseMovieRepositories.SingleOrDefault(x => x.Id == item.MovieId).Name
 
-            }).ToList();
+            }).ToList();*/
         }
     }
 }

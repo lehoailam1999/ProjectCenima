@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Domain.Enumerates;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Domain.InterfaceRepositories
 {
     public interface IIncomeRepositories
     {
-        Task<List<Bill>> GetIncome();
+        Task<List<CinemaRevenue>> GetIncome(DateTime startAt, DateTime endAt);
         Task<List<Food>> GetFoodHighLight(int itemAmount);
     }
 }

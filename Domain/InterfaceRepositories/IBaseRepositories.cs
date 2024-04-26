@@ -16,6 +16,7 @@ namespace Domain.InterfaceRepositories
         Task<TEntity> GetByIdAsync(int id);
         Task<bool> DeleteAsync(int id);
         Task<List<TEntity>> GetAll();
+        Task<List<TEntity>> GetAllByID(Expression<Func<TEntity, bool>> predicate);
         Task<TEntity> SingleOrDefaultAsync(Expression<Func<TEntity,bool>> predicate);
        TEntity SingleOrDefault(Expression<Func<TEntity,bool>> predicate);
         Task<List<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate);

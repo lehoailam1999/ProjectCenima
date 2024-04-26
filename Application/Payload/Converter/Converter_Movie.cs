@@ -17,6 +17,7 @@ namespace Application.Payload.Converter
         {
             Response_Movie response = new Response_Movie()
             {
+                Id=movie.Id,
                 MovieDuration = movie.MovieDuration,
                 Description = movie.Description,
                 EndTime=movie.EndTime,
@@ -34,8 +35,10 @@ namespace Application.Payload.Converter
         }
         public List<Response_Movie> EntityToListDTO(List<Movie> listMovie)
         {
+
             return listMovie.Select(item => new Response_Movie
             {
+                Id = item.Id,
                 MovieDuration = item.MovieDuration,
                 Description = item.Description,
                 EndTime = item.EndTime,

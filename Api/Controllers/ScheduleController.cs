@@ -22,6 +22,12 @@ namespace Api.Controllers
             var listSchedule = await _scheduleServices.GetAll();
             return Ok(listSchedule);
         }
+        [HttpGet("GetAllScheduleByIdMovie")]
+        public async Task<IActionResult> GetAllScheduleByIdMovie(int idMovie)
+        {
+            var listSchedule = await _scheduleServices.GetAllById(idMovie);
+            return Ok(listSchedule);
+        }
         [HttpPost]
 
         public async Task<IActionResult> AddNewSchedule(Request_Schedules request)

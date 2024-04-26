@@ -19,13 +19,15 @@ namespace Application.Service.Services
         private readonly IBaseRepositories<Room> _baseRoomRepositories;
         private readonly Converter_Room _converter;
         private readonly ResponseObject<Response_Room> _respon;
+        private readonly ResponseObject<List<Response_Room>> _responlist;
         private readonly Response_Pagination<Response_Room> _respon_pagination;
 
-        public RoomServices(IBaseRepositories<Room> baseRoomRepositories, Converter_Room converter, ResponseObject<Response_Room> respon, Response_Pagination<Response_Room> respon_pagination)
+        public RoomServices(IBaseRepositories<Room> baseRoomRepositories, Converter_Room converter, ResponseObject<Response_Room> respon, ResponseObject<List<Response_Room>> responlist, Response_Pagination<Response_Room> respon_pagination)
         {
             _baseRoomRepositories = baseRoomRepositories;
             _converter = converter;
             _respon = respon;
+            _responlist = responlist;
             _respon_pagination = respon_pagination;
         }
 
@@ -59,6 +61,12 @@ namespace Application.Service.Services
         {
             var list = await _baseRoomRepositories.GetAll();
             return _respon_pagination.ResponseSuccess("Danh sach Room",pageNumber, pageSize, _converter.EntityToListDTO(list));
+        }
+
+        public async Task<ResponseObject<List<Response_Room>>> GetAllRoom()
+        {
+            var list = await _baseRoomRepositories.GetAll();
+            return _responlist.ResponseSuccess("Danh sach Room", _converter.EntityToListDTO(list));
         }
 
         public async Task<ResponseObject<Response_Room>> UpdateRoom(int id)

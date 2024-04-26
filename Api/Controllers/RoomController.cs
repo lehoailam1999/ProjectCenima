@@ -18,10 +18,16 @@ namespace Api.Controllers
             _roomServices = roomServices;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllRoom(int pageSize=1,int pageNumber=1)
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAll(int pageSize=1,int pageNumber=1)
         {
             var listRoom = await _roomServices.GetAll(pageSize,pageNumber);
+            return Ok(listRoom);
+        }
+        [HttpGet("GetAllRoom")]
+        public async Task<IActionResult> GetAllRoom()
+        {
+            var listRoom = await _roomServices.GetAllRoom();
             return Ok(listRoom);
         }
         [HttpPost]

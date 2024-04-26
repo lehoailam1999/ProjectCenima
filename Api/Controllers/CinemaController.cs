@@ -16,11 +16,17 @@ namespace Api.Controllers
         {
             _cenimaServices = cenimaServices;
         }
-        [HttpGet]
+        [HttpGet("GetAllCinemaPagination")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAllCinema(int pageNumber=1,int pageSize = 5)
+        public async Task<IActionResult> GetAllCinemaPagination(int pageNumber=1,int pageSize = 5)
         {
             var listCinema =await _cenimaServices.GetAll(pageNumber,pageSize);
+            return Ok(listCinema);
+        }
+        [HttpGet("GetAllCinema")]
+        public async Task<IActionResult> GetAllCinema()
+        {
+            var listCinema = await _cenimaServices.GetAllCinema();
             return Ok(listCinema);
         }
         [HttpPost]

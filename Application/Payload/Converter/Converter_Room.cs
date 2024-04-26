@@ -14,6 +14,7 @@ namespace Application.Payload.Converter
         {
             Response_Room response = new Response_Room()
             {
+                Id=room.Id,
                 Capacity = room.Capacity,
                 Type = room.Type,
                 Description = room.Description,
@@ -28,7 +29,7 @@ namespace Application.Payload.Converter
         {
             return listroom.Select(item => new Response_Room
             {
-
+                Id=item.Id,
                 Capacity = item.Capacity,
                 Type = item.Type,
                 Description = item.Description,

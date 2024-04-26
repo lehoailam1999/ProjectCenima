@@ -4,16 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Payload.DataResponse
+namespace Domain.Enumerates
 {
-    public class Response_Revenue
+    public class CinemaRevenue
     {
-
         public int Id { get; set; }
+        public string NameOfCinema { get; set; }
         public string Address { get; set; }
         public string Description { get; set; }
-        public string NameOfCinema { get; set; }
-        public double ToTalRevenue { get; set; }
+        public double TotalRevenue { get; set; }
     }
-   
 }

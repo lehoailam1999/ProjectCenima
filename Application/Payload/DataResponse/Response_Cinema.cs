@@ -8,6 +8,7 @@ namespace Application.Payload.DataResponse
 {
     public class Response_Cinema
     {
+        public int Id { get; set; }
         public string Address { get; set; }
         public string Description { get; set; }
         public string Code { get; set; }

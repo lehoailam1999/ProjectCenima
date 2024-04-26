@@ -65,6 +65,18 @@ namespace Application.Service.Services
             return listRes.ResponseSuccess("Danh sach Cinema",pageSize,pageNumber, _converter.EntityToListDTO(list));
         }
 
+        public async Task<ResponseObject<List<Response_Cinema>>> GetAllCinema()
+        {
+            ResponseObject<List<Response_Cinema>> response = new ResponseObject<List<Response_Cinema>>();
+            var list = await _baseCinemaRepositories.GetAll();
+            if (list == null && list.Count == 0)
+            {
+                return response.ResponseError(StatusCodes.Status404NotFound, "Danh sach cinema bị lỗi",null);
+            }
+            return response.ResponseSuccess( "Danh sach cinema ", _converter.EntityToListDTO(list));
+
+        }
+
         public async Task<ResponseObject<Response_Cinema>> UpdateCinema(int id)
         {
             var cinemaUpdate = await _baseCinemaRepositories.FindAsync(id);

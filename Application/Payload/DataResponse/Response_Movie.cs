@@ -8,6 +8,7 @@ namespace Application.Payload.DataResponse
 {
     public class Response_Movie
     {
+        public int Id { get; set; }
         public int MovieDuration { get; set; }
         public DateTime EndTime { get; set; }
         public DateTime PremiereDate { get; set; }

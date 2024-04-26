@@ -16,6 +16,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.Text;
 using Application.Payload.Converter.Converter_BillBook;
+using Domain.Enumerates;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -53,6 +54,7 @@ builder.Services.AddScoped<Converter_Seat>();
 builder.Services.AddScoped<IRoomServices, RoomServices>();
 builder.Services.AddTransient<IBaseRepositories<Room>, BaseRepositories<Room>>();
 builder.Services.AddScoped<ResponseObject<Response_Room>>();
+builder.Services.AddScoped<ResponseObject<List<Response_Room>>>();
 builder.Services.AddScoped<Response_Pagination<Response_Room>>();
 builder.Services.AddScoped<Converter_Room>();
 //Food
@@ -107,10 +109,11 @@ builder.Services.AddScoped<IBaseRepositories<Seat>, BaseRepositories<Seat>>();
 //Income
 builder.Services.AddScoped<IIncomeRepositories, IncomeRepositories>();
 builder.Services.AddScoped<IIncomeServices, IncomeServices>();
-builder.Services.AddScoped<ResponseObject<List<Response_Revenue>>>();
+builder.Services.AddScoped<ResponseObject<List<CinemaRevenue>>>();
 
 
 builder.Services.AddScoped<IVnPayService, VnPayService>();
+builder.Services.AddScoped<IPhotoServices, PhoToServices>();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;

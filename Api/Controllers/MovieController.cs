@@ -24,7 +24,7 @@ namespace Api.Controllers
             return Ok(listMovie);
         }
         [HttpPost]
-        public async Task<IActionResult> AddNewMovie(Request_Movie request)
+        public async Task<IActionResult> AddNewMovie([FromForm] Request_Movie request)
         {
             var Movie = await _movieServices.AddNewMovie(request);
             return Ok(Movie);

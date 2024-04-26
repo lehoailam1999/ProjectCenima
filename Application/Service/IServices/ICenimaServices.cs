@@ -13,6 +13,8 @@ namespace Application.Service.IServices
     public interface ICenimaServices
     {
         Task<Response_Pagination<Response_Cinema>> GetAll(int pageSize,int pageNumber);
+        Task<ResponseObject<List<Response_Cinema>>> GetAllCinema();
+
         Task<ResponseObject<Response_Cinema>> AddNewCinema(Request_Cinema request);
         Task<string> DeleteCinema(int id);
         Task<ResponseObject<Response_Cinema>> UpdateCinema(int id);
