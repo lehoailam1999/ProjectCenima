@@ -73,15 +73,19 @@ namespace Application.Service.Services
 
         }
 
-        public async Task<ResponseObject<Response_Seat>> UpdateSeat(int id)
+        public async Task<ResponseObject<Response_Seat>> UpdateSeat(int id, Request_Seat request)
         {
-            var seatUpdate = await _baseSeatRepositories.FindAsync(id);
-            if (seatUpdate == null)
+            var seat = await _baseSeatRepositories.FindAsync(id);
+            if (seat == null)
             {
                 return _respon.ResponseError(StatusCodes.Status404NotFound, "Khong tim thay cinema", null);
             }
-            await _baseSeatRepositories.UpdateAsync(seatUpdate);
-            return _respon.ResponseSuccess("Update Seat Successfully",  _converter.EntityToDTO(seatUpdate));
+            seat.Number = request.Number;
+            seat.Line = request.Line;
+            seat.RoomId = request.RoomId;
+            seat.SeatTypeId = request.SeatTypeId;
+            await _baseSeatRepositories.UpdateAsync(seat);
+            return _respon.ResponseSuccess("Update Seat Successfully",  _converter.EntityToDTO(seat));
 
         }
     }

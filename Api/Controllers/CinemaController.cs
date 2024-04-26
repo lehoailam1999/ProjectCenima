@@ -37,9 +37,9 @@ namespace Api.Controllers
             return Ok(cinema);
         }
         [HttpPut]
-        public async Task<IActionResult> UpdateCinema(int id)
+        public async Task<IActionResult> UpdateCinema(int id, Request_Cinema request)
         {
-            var cinema =await _cenimaServices.UpdateCinema(id);
+            var cinema =await _cenimaServices.UpdateCinema(id,request);
             return Ok(cinema);
         }
         [HttpDelete]

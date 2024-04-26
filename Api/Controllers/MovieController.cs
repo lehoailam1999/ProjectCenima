@@ -30,9 +30,9 @@ namespace Api.Controllers
             return Ok(Movie);
         }
         [HttpPut]
-        public async Task<IActionResult> UpdateMovie(int id)
+        public async Task<IActionResult> UpdateMovie(int id, Request_Movie request)
         {
-            var Movie = await _movieServices.UpdateMovie(id);
+            var Movie = await _movieServices.UpdateMovie(id,request);
             return Ok(Movie);
         }
         [HttpDelete]

@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Application.Service.Services
@@ -40,7 +41,7 @@ namespace Application.Service.Services
             movie.PremiereDate = DateTime.Now;
             movie.Director = request.Director;
             movie.Image = await _photoServices.UploadPhoToAsync(request.Image);
-            movie.HeroImage = request.HeroImage;
+            movie.HeroImage = await _photoServices.UploadPhoToAsync(request.HeroImage);
             movie.Language = request.Language;
             movie.Name = request.Name;
             movie.Trailer = request.Trailer;
@@ -67,15 +68,27 @@ namespace Application.Service.Services
             return listRes.ResponseSuccess("Danh sach Movie", _converter.EntityToListDTO(list));
         }
 
-        public async Task<ResponseObject<Response_Movie>> UpdateMovie(int id)
+        public async Task<ResponseObject<Response_Movie>> UpdateMovie(int id, Request_Movie request)
         {
-            var movieUpdate = await _baseMovieRepositories.FindAsync(id);
-            if (movieUpdate == null)
+            var movie = await _baseMovieRepositories.FindAsync(id);
+            if (movie == null)
             {
                 return _respon.ResponseError(StatusCodes.Status404NotFound, "Khong tim thay movie", null);
             }
-            await _baseMovieRepositories.UpdateAsync(movieUpdate);
-            return _respon.ResponseSuccess("Update movie Successfully", _converter.EntityToDTO(movieUpdate));
+            movie.MovieDuration = request.MovieDuration;
+            movie.Description = request.Description;
+            movie.EndTime = DateTime.Now;
+            movie.PremiereDate = DateTime.Now;
+            movie.Director = request.Director;
+            movie.Image = await _photoServices.UploadPhoToAsync(request.Image);
+            movie.HeroImage = await _photoServices.UploadPhoToAsync(request.HeroImage);
+            movie.Language = request.Language;
+            movie.Name = request.Name;
+            movie.Trailer = request.Trailer;
+            movie.RateId = request.RateId;
+            movie.MovieTypeId = request.MovieTypeId;
+            await _baseMovieRepositories.UpdateAsync(movie);
+            return _respon.ResponseSuccess("Update movie Successfully", _converter.EntityToDTO(movie));
         }
     }
 }

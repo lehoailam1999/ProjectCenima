@@ -37,9 +37,9 @@ namespace Api.Controllers
             return Ok(seat);
         }
         [HttpPut]
-        public async Task<IActionResult> UpdateSeat(int id)
+        public async Task<IActionResult> UpdateSeat(int id, Request_Seat request)
         {
-            var Seat = await _seatServices.UpdateSeat(id);
+            var Seat = await _seatServices.UpdateSeat(id,request);
             return Ok(Seat);
         }
         [HttpDelete]

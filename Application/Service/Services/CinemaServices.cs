@@ -77,15 +77,18 @@ namespace Application.Service.Services
 
         }
 
-        public async Task<ResponseObject<Response_Cinema>> UpdateCinema(int id)
+        public async Task<ResponseObject<Response_Cinema>> UpdateCinema(int id,Request_Cinema request)
         {
-            var cinemaUpdate = await _baseCinemaRepositories.FindAsync(id);
-            if (cinemaUpdate == null)
+            var cinema = await _baseCinemaRepositories.FindAsync(id);
+            if (cinema == null)
             {
                 return _respon.ResponseError(StatusCodes.Status404NotFound, "Khong tim thay cinema", null);
             }
-            await _baseCinemaRepositories.UpdateAsync(cinemaUpdate);
-            return _respon.ResponseSuccess( "Update Cinema Successfully", _converter.EntityToDTO(cinemaUpdate));
+            cinema.Address = request.Address;
+            cinema.Description = request.Description;
+            cinema.NameOfCinema = request.NameOfCinema;
+            await _baseCinemaRepositories.UpdateAsync(cinema);
+            return _respon.ResponseSuccess( "Update Cinema Successfully", _converter.EntityToDTO(cinema));
 
 
         }

@@ -19,14 +19,16 @@ namespace Application.Service.Services
         private readonly IBaseRepositories<Food> _baseFoodRepositories;
         private readonly Converter_Food _converter;
         private readonly ResponseObject<Response_Food> _respon;
-        Response_Pagination<Response_Food> _listRes;
+        private readonly Response_Pagination<Response_Food> _listRes;
+        private readonly IPhotoServices _photoServices;
 
-        public FoodServices(IBaseRepositories<Food> baseFoodRepositories, Converter_Food converter, ResponseObject<Response_Food> respon, Response_Pagination<Response_Food> listRes)
+        public FoodServices(IBaseRepositories<Food> baseFoodRepositories, Converter_Food converter, ResponseObject<Response_Food> respon, Response_Pagination<Response_Food> listRes, IPhotoServices photoServices)
         {
             _baseFoodRepositories = baseFoodRepositories;
             _converter = converter;
             _respon = respon;
             _listRes = listRes;
+            _photoServices = photoServices;
         }
 
         public async Task<ResponseObject<Response_Food>> AddNewFood(Request_Food request)
@@ -36,7 +38,7 @@ namespace Application.Service.Services
             food.NameofFood = request.NameofFood;
             food.IsActive = true;
             food.Description = request.Description; 
-            food.Image = request.Image;
+            food.Image = await _photoServices.UploadPhoToAsync(request.Image);
             await _baseFoodRepositories.AddAsync(food);
             return _respon.ResponseSuccess("Add food Successfully", _converter.EntityToDTO(food));
         }

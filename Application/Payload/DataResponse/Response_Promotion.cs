@@ -1,14 +1,16 @@
-﻿using System;
+﻿using Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Entities
+namespace Application.Payload.DataResponse
 {
-    public class Promotion:BaseEntity
+    public class Response_Promotion
     {
+        public int Id { get; set; }
         public int Percent { get; set; }
         public int Quantity { get; set; }
         public string Type { get; set; }
@@ -17,10 +19,7 @@ namespace Domain.Entities
         public string Description { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
-        [ForeignKey("RankCustomerId")]
         public int RankCustomerId { get; set; }
-        public RankCustomer rankCustomer { get; set; }
-        public IEnumerable<Bill>? bill { get; set; }
-
+       
     }
 }

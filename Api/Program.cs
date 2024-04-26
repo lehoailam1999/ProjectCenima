@@ -44,7 +44,6 @@ builder.Services.AddScoped<ICenimaServices, CinemaServices>();
 builder.Services.AddTransient<IBaseRepositories<Cinema>, BaseRepositories<Cinema>>();
 builder.Services.AddScoped<ResponseObject<Response_Cinema>>();
 builder.Services.AddScoped<Converter_Cinema>();
-
 //Seat
 builder.Services.AddScoped<ISeatServices, SeatServices>();
 builder.Services.AddTransient<IBaseRepositories<Seat>, BaseRepositories<Seat>>();
@@ -69,6 +68,13 @@ builder.Services.AddScoped<ISchedulesServices, SchedulesServices>();
 builder.Services.AddTransient<IBaseRepositories<Schedule>, BaseRepositories<Schedule>>();
 builder.Services.AddScoped<ResponseObject<Response_Schedules>>();
 builder.Services.AddScoped<Converter_Schedules>();
+//Promotion
+builder.Services.AddScoped<IPromotionServices, PromotionServices>();
+builder.Services.AddTransient<IBaseRepositories<Promotion>, BaseRepositories<Promotion>>();
+builder.Services.AddScoped<ResponseObject<Response_Promotion>>();
+builder.Services.AddScoped<Response_Pagination<Response_Promotion>>();
+builder.Services.AddScoped<ResponseObject<List<Response_Promotion>>>();
+builder.Services.AddScoped<Converter_Promotion>();
 //Movie
 builder.Services.AddScoped<IMovieServices, MovieServices>();
 builder.Services.AddTransient<IBaseRepositories<Movie>, BaseRepositories<Movie>>();

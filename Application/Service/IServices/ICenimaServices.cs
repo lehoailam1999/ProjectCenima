@@ -17,6 +17,6 @@ namespace Application.Service.IServices
 
         Task<ResponseObject<Response_Cinema>> AddNewCinema(Request_Cinema request);
         Task<string> DeleteCinema(int id);
-        Task<ResponseObject<Response_Cinema>> UpdateCinema(int id);
+        Task<ResponseObject<Response_Cinema>> UpdateCinema(int id, Request_Cinema request);
     }
 }
