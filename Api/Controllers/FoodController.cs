@@ -17,6 +17,8 @@ namespace Api.Controllers
             _foodServices = foodServices;
         }
         [HttpGet]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> GetAllFood(int pageNumber = 1, int pageSize = 5)
         {
             var listFood = await _foodServices.GetAll(pageNumber, pageSize);
@@ -24,18 +26,24 @@ namespace Api.Controllers
         }
        
         [HttpPost]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> AddNewFood(Request_Food request)
         {
             var food = await _foodServices.AddNewFood(request);
             return Ok(food);
         }
         [HttpPut]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> UpdateFood(int id)
         {
             var food = await _foodServices.UpdateFood(id);
             return Ok(food);
         }
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> DeleteFood(int id)
         {
             var delete = await _foodServices.DeleteFood(id);
